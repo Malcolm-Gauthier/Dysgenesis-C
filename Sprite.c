@@ -12,7 +12,6 @@ int InitSprite(Sprite* sprite, Jeu* jeu) {
 	sprite->indexs_de_tir[0] = -1;
 	sprite->indexs_de_tir[1] = -1;
 	sprite->indexs_lignes_sauter = NULL;
-	sprite->indexs_lignes_sauter_longueur = 0;
 	sprite->modele = NULL;
 	sprite->modele_longueur = 0;
 	sprite->pitch = 0;

@@ -30,7 +30,7 @@ Projectile* CreerProjectile(Jeu* jeu, Vector3 position, Vector3 destination, Pro
 	projectile->laser = SDL_FALSE;
 	projectile->z_init = position.z;
 
-	if (proprietaire == JOUEUR) {
+	if (proprietaire == PROPRIETAIREPROJ_JOUEUR) {
 
 		if (GamemodeAction(jeu) && !son_cree) {
 
@@ -126,7 +126,7 @@ int PositionsSurEcran(Projectile* projectile, float* output) {
 	Vector3 pos = projectile->self.position;
 	Vector3 dest = projectile->cible;
 
-	if (projectile->proprietaire == ENNEMI) {
+	if (projectile->proprietaire == PROPRIETAIREPROJ_ENNEMI) {
 
 		Vector3 temp = pos;
 		pos = dest;
@@ -167,7 +167,7 @@ int CollisionProjectileJoueur(Projectile* projectile) {
 		return -1;
 	}
 
-	if (projectile->proprietaire == JOUEUR) {
+	if (projectile->proprietaire == PROPRIETAIREPROJ_JOUEUR) {
 
 		return -2;
 	}
@@ -232,7 +232,7 @@ void RenderProjectile(Projectile* projectile) {
 
 	SDL_Renderer* render = projectile->self.jeu->render;
 
-	if (projectile->proprietaire == ENNEMI) {
+	if (projectile->proprietaire == PROPRIETAIREPROJ_ENNEMI) {
 
 		SDL_SetRenderDrawColor(render, 255, 0, 0, 255);
 	}

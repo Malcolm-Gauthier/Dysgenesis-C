@@ -7,25 +7,24 @@ typedef struct ItemData {
 	Vector3* modele;
 	i32 modele_longueure;
 	i32* sauts_modele;
-	i32 sauts_modele_longueure;
 } ItemData;
 
 #define DATAITEM_CAPACITE 7
 ItemData DataItem[DATAITEM_CAPACITE] = {
-	{.ID = TYPEITEM_HP, .couleure = {.r = 255,.g = 0,.b = 0,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL, .sauts_modele_longueure = 0 },
-	{.ID = TYPEITEM_VAGUE, .couleure = {.r = 0,.g = 255,.b = 255,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL, .sauts_modele_longueure = 0 },
-	{.ID = TYPEITEM_X2_SHOT, .couleure = {.r = 255,.g = 128,.b = 0,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL, .sauts_modele_longueure = 0 },
-	{.ID = TYPEITEM_X3_SHOT, .couleure = {.r = 255,.g = 255,.b = 0,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL, .sauts_modele_longueure = 0 },
-	{.ID = TYPEITEM_HOMING, .couleure = {.r = 64,.g = 255,.b = 64,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL, .sauts_modele_longueure = 0 },
-	{.ID = TYPEITEM_SPREAD, .couleure = {.r = 0,.g = 0,.b = 255,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL, .sauts_modele_longueure = 0 },
-	{.ID = TYPEITEM_LASER, .couleure = {.r = 128,.g = 0,.b = 255,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL, .sauts_modele_longueure = 0 },
+	{.ID = TYPEITEM_HP, .couleure = {.r = 255,.g = 0,.b = 0,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL },
+	{.ID = TYPEITEM_VAGUE, .couleure = {.r = 0,.g = 255,.b = 255,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL },
+	{.ID = TYPEITEM_X2_SHOT, .couleure = {.r = 255,.g = 128,.b = 0,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL },
+	{.ID = TYPEITEM_X3_SHOT, .couleure = {.r = 255,.g = 255,.b = 0,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL },
+	{.ID = TYPEITEM_HOMING, .couleure = {.r = 64,.g = 255,.b = 64,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL },
+	{.ID = TYPEITEM_SPREAD, .couleure = {.r = 0,.g = 0,.b = 255,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL },
+	{.ID = TYPEITEM_LASER, .couleure = {.r = 128,.g = 0,.b = 255,.a = 255}, .modele = NULL, .modele_longueure = 0, .sauts_modele = NULL },
 };
 
-int CreerItem(Ennemi* parent) {
+Item* CreerItem(Ennemi* parent) {
 
 	if (parent == NULL) {
 
-		return -1;
+		return NULL;
 	}
 
 	Jeu* jeu = parent->self.jeu;
@@ -42,7 +41,7 @@ int CreerItem(Ennemi* parent) {
 
 	if (item == NULL) {
 
-		return -2;
+		return NULL;
 	}
 
 	float nb_hasard = RNG(0, 100);
@@ -61,10 +60,10 @@ int CreerItem(Ennemi* parent) {
 
 	if (nb_hasard < 80) {
 
-		return 1;
+		item->type = TYPEITEM_NONE;
+		return item;
 	}
 
-	item->type = TYPEITEM_NONE;
 	item->self.position = parent->self.position;
 
 	if (nb_hasard < 85)
@@ -99,7 +98,8 @@ int CreerItem(Ennemi* parent) {
 
 	if (!data_trouve) {
 
-		return -3;
+		item->type = TYPEITEM_NONE;
+		return item;
 	}
 
 	item->self.afficher = SDL_TRUE;
@@ -107,9 +107,8 @@ int CreerItem(Ennemi* parent) {
 	item->self.modele = DataItem[i].modele;
 	item->self.modele_longueur = DataItem[i].modele_longueure;
 	item->self.indexs_lignes_sauter = DataItem[i].sauts_modele;
-	item->self.indexs_lignes_sauter_longueur = DataItem[i].sauts_modele_longueure;
 
-	return 0;
+	return item;
 }
 
 SDL_bool ItemExist(Item* item) {

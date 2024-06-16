@@ -18,8 +18,8 @@ typedef struct Projectile {
 } Projectile;
 
 typedef enum ProprietaireProjectile {
-	JOUEUR,
-	ENNEMI
+	PROPRIETAIREPROJ_JOUEUR,
+	PROPRIETAIREPROJ_ENNEMI
 } ProprietaireProjectile;
 
 Projectile* CreerProjectile(Jeu* jeu, Vector3 position, Vector3 destination, ProprietaireProjectile proprietaire, u8 ID);

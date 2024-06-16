@@ -7,7 +7,6 @@ typedef struct Sprite {
 	Vector3* modele;
 	i32 modele_longueur;
 	i32* indexs_lignes_sauter;
-	i32 indexs_lignes_sauter_longueur;
 
 	Vector3 position;
 	SDL_Color couleure;

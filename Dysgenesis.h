@@ -50,6 +50,8 @@ typedef struct Jeu {
 	VagueElectrique* vague_electrique;
 	Curseur* curseur;
 
+	i32 gTimer;
+
 	SDL_bool bouger_etoiles;
 	Gamemode gamemode;
 	i32 touches_pesees;
@@ -57,6 +59,7 @@ typedef struct Jeu {
 	i32 niveau_continue;
 	i32 ennemis_restant;
 	i32 ennemis_tues;
+	SDL_Color couleure_fond_ecran;
 } Jeu;
 
 typedef enum Gamemode {

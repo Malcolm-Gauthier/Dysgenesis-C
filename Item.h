@@ -23,7 +23,7 @@ typedef struct Item {
 	TypeItem type;
 } Item;
 
-int CreerItem(Ennemi* parent);
+Item* CreerItem(Ennemi* parent);
 
 SDL_bool ItemExist(Item* item);
 

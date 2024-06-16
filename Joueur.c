@@ -13,7 +13,6 @@ int CreerJoueur(Joueur* joueur) {
 	joueur->self.modele_longueur = 0;
 
 	joueur->self.indexs_lignes_sauter = NULL;
-	joueur->self.indexs_lignes_sauter_longueur = 0;
 
 	InitializerJoueur(joueur);
 
@@ -54,12 +53,14 @@ SDL_bool ExistJoueur(Joueur* joueur) {
 		return SDL_FALSE;
 	}
 
+	TirJoueur(joueur);
+
 	joueur->vagues_electriques += VAGUE_ELECTRIQUE_REGENERATION;
 
 	return SDL_FALSE;
 }
 
-static int Tir(Joueur* joueur) {
+static int TirJoueur(Joueur* joueur) {
 
 	const Vector2 DECALS_PROJ[] = {
 		(Vector2) { 10, -200 },
@@ -102,7 +103,7 @@ static int Tir(Joueur* joueur) {
 				joueur->self.position.y + DECALS_PROJ[i].y,
 				MAX_PROFONDEUR
 			},
-			JOUEUR,
+			PROPRIETAIREPROJ_JOUEUR,
 			(u8)(i % 2)
 		);
 	}
@@ -148,7 +149,6 @@ static void AnimationMort(Joueur* joueur) {
 		}
 		lignes_a_sauter_temporaire[longueure_liste] = -1;
 		joueur->self.indexs_lignes_sauter = lignes_a_sauter_temporaire;
-		joueur->self.indexs_lignes_sauter_longueur = longueure_liste;
 	}
 
 	if (joueur->self.timer < UINT8_MAX) {
@@ -176,7 +176,6 @@ static void AnimationMort(Joueur* joueur) {
 		joueur->self.timer = 0;
 
 		joueur->self.indexs_lignes_sauter = NULL;
-		joueur->self.indexs_lignes_sauter_longueur = 0;
 		free(lignes_a_sauter_temporaire);
 
 		JouerMusique(0);
