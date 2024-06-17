@@ -26,7 +26,7 @@ void InitializerJoueur(Joueur* joueur);
 
 SDL_bool ExistJoueur(Joueur* joueur);
 
-int Tir(Joueur* joueur);
+int TirJoueur(Joueur* joueur);
 
 void AnimationMort(Joueur* joueur);
 

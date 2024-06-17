@@ -84,13 +84,3 @@ i32 RNG(i32 min, i32 max) {
 
 	return rand() % SDL_abs(max - min) + min;
 }
-
-SDL_Color RGBAtoSDLColor(u32 RGBA) {
-
-	return (SDL_Color) {
-		.r = (u8)(RGBA >> 24),
-		.g = (u8)(RGBA >> 16),
-		.b = (u8)(RGBA >> 8),
-		.a = (u8)RGBA
-	};
-}
