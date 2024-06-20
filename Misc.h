@@ -2,6 +2,7 @@
 #include "Dysgenesis.h"
 
 typedef struct BombePulsar {
+    Jeu* jeu;
     i32 HP;
     i32 timer;
     SDL_bool frapee;
@@ -11,7 +12,8 @@ const u8 QUANTITE_RAYONS_BOMBE_PULSAR = 50;
 const i32 BOMBE_PULSAR_MAX_HP = 50;
 #define COULEUR_BOMBE (SDL_Color){ .r = 150, .g = 255, .b = 255, .a = 255 }
 
-const float hyperbole_bleue_bombe_pulsar_data[72] = {
+#define HYP_BOMBE_DATA_LEN 72
+const float hyperbole_bleue_bombe_pulsar_data[HYP_BOMBE_DATA_LEN] = {
     -0.35f, -0.95f, -0.4f, -1.55f,
     -0.4f, -1.55f, -0.6f, -2.15f,
     -0.6f, -2.15f, -0.9f, -2.35f,
@@ -32,24 +34,24 @@ const float hyperbole_bleue_bombe_pulsar_data[72] = {
     -0.4f, 1.75f, -0.25f, 1.3f
 };
 
-void DessinerBombePulsar(Vector2 position, u8 rayon, SDL_Color couleure, SDL_bool hyperbole_bleue);
+void DessinerBombePulsar(SDL_Renderer* render, Vector2 position, u8 rayon, SDL_Color couleure, SDL_bool hyperbole_bleue);
 
 int AnimationExplosionBombe(BombePulsar* bombe);
 
 int CollisionBombeProjectile(BombePulsar* bombe, Jeu* jeu);
 
-SDL_bool ExistBombe(BombePulsar* bome);
+void ExistBombe(BombePulsar* bombe);
 
 
 const i32 DENSITE_ETOILES = 100;
 const i32 RAYON_DEBUT_ETOILES = 100;
 const float VITESSE_ETOILES = 1.02f;
 
-int CreerEtoiles(Vector2* etoiles, i32 limite);
+int CreerEtoiles(Vector2* etoiles, i32 limite, SDL_Rect bounds);
 
 void BougerEtoiles(Vector2* etoiles, i32 nb_etoiles);
 
-void RenderEtoiles(Vector2* etoiles, i32 nb_etoiles);
+void RenderEtoiles(SDL_Renderer* render, Vector2* etoiles, i32 nb_etoiles);
 
 
 // documentation texte
@@ -77,8 +79,8 @@ void RenderEtoiles(Vector2* etoiles, i32 nb_etoiles);
 //         int.MaxValue par défaut. si scroll est négatif, aucun texte n'est affiché.
 //
 //
-#define CENTRE INT32_MAX
-#define NO_SCROLL INT32_MAX
+#define CENTRE SDL_MAX_SINT32
+#define NO_SCROLL SDL_MAX_SINT32
 #define BLANC 0xFFFFFF
 #define ROUGE 0xFF0000
 #define VERT 0x00FF00
@@ -400,8 +402,8 @@ void DisplayText(Jeu* jeu, char* text, Vector2 position, float size, int color, 
 
     if (alpha < 0)
         alpha = 0;
-    else if (alpha > UINT8_MAX)
-        alpha = UINT8_MAX;
+    else if (alpha > SDL_MAX_UINT8)
+        alpha = SDL_MAX_UINT8;
 
     if (position.x == CENTRE)
         position.x = W_SEMI_LARGEUR - ((LARGEUR_DEFAUT + ESPACE_DEFAUT) * size * strlen - 1) / 2;
@@ -457,9 +459,9 @@ void DisplayText(Jeu* jeu, char* text, Vector2 position, float size, int color, 
 }
 
 
-void Scene0(i32 gTimer);
+void Scene0(Jeu* jeu, i32 gTimer);
 
-void Scene4(i32 gTimer);
+void Scene4(Jeu* jeu, i32 gTimer);
 
 typedef enum OptionsCurseur {
     CURSEUR_NOUVELLE_PARTIE,
@@ -478,10 +480,12 @@ typedef struct Curseur {
 } Curseur;
 
 const int CURSEUR_DAS = G_FPS / 4;
-const int CURSEUR_X_INIT;
-const int CURSEUR_Y_INIT;
+const int CURSEUR_X_INIT = W_SEMI_LARGEUR - 150;
+const int CURSEUR_Y_INIT = W_SEMI_HAUTEUR + 85;
 const int CURSEUR_ESPACE = 50;
-const Vector3 curseur_modele[] =
+
+#define MODELE_CURSEUR_LONGUEURE 5
+const Vector3 curseur_modele[MODELE_CURSEUR_LONGUEURE] =
 {
     { .x=-15, .y=-15, .z=0},
     { .x=15, .y=0, .z=0 },
@@ -507,7 +511,7 @@ SDL_bool ExistExplosion(Explosion* explosion);
 
 void RenderExplosion(Explosion* explosion);
 
-
+#define NB_EFFETS 8
 typedef enum EffetAudio {
     EFFET_PRESENTE,
     EFFET_NIVEAU,
@@ -519,6 +523,7 @@ typedef enum EffetAudio {
     EFFET_DOTV_ENTREE
 } EffetAudio;
 
+#define NB_MUSIQUE 7
 typedef enum Musique {
     MUSIQUE_ATW,
     MUSIQUE_CRTP,
@@ -529,6 +534,30 @@ typedef enum Musique {
     MUSIQUE_DCQBPM,
 } Musique;
 
+static struct DataAudio {
+    i32 ID;
+    const char* fichier;
+};
+static struct DataAudio MusiqueData[NB_MUSIQUE] = {
+    { MUSIQUE_ATW, "audio\\around the world.wav" },
+    { MUSIQUE_CRTP, "audio\\cant remove the pain.wav" },
+    { MUSIQUE_DYSGENESIS, "audio\\titlescreen.wav" },
+    { MUSIQUE_TBOT, "audio\\the beginning of Time.wav" },
+    { MUSIQUE_DOTV, "audio\\Dance of the Violins.wav" },
+    { MUSIQUE_EUGENESIS, "audio\\eugenesis.wav" },
+    { MUSIQUE_DCQBPM, "audio\\240 Bits Per Mile.wav" }
+};
+static struct DataAudio EffetData[NB_EFFETS] = {
+    { EFFET_PRESENTE, "audio\\presents.wav" },
+    { EFFET_NIVEAU, "audio\\sfx1.wav" },
+    { EFFET_TIR, "audio\\laserShoot.wav" },
+    { EFFET_EXPLOSION_ENNEMI, "audio\\explosion_enemy.wav" },
+    { EFFET_EXPLOSION_JOUEUR, "audio\\explosion.wav" },
+    { EFFET_POWERUP, "audio\\powerup.wav" },
+    { EFFET_VAGUE, "audio\\synth.wav" },
+    { EFFET_DOTV_ENTREE, "audio\\tone.wav" }
+};
+
 #define NB_CHAINES_SFX 20
 typedef struct Son {
     Mix_Music* musique;
@@ -538,7 +567,6 @@ typedef struct Son {
     i32 index_prochain_chunk;
     u8 volume;
     i32 volume_sdl;
-    SDL_bool render;
 } Son;
 
 #define ALL_CHUNKS -1
@@ -558,4 +586,4 @@ int JouerEffet(Jeu* jeu, EffetAudio effet_a_jouer);
 
 void ChangerVolume(Jeu* jeu);
 
-void RenderVolume(Son* son);
+void RenderVolume(Jeu* son);

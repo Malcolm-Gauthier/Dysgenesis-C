@@ -102,6 +102,7 @@ Item* CreerItem(Ennemi* parent) {
 		return item;
 	}
 
+	InitSprite(&item->self, jeu);
 	item->self.afficher = SDL_TRUE;
 	item->self.couleure = DataItem[i].couleure;
 	item->self.modele = DataItem[i].modele;

@@ -1,6 +1,8 @@
 #pragma once
 #include "Dysgenesis.h"
 
+const i32 SAUTS_MODELE_AUCUN = -1;
+
 typedef struct Sprite {
 	Jeu* jeu;
 

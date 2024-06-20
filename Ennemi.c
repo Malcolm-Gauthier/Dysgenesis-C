@@ -65,6 +65,8 @@ Ennemi* CreerEnnemi(Jeu* jeu, TypeEnnemi type, StatusEnnemi statut, Ennemi* pare
 	ennemi->intervale_tir = G_FPS / DataEnnemi[i].vitesse_tir;
 	ennemi->HP = DataEnnemi[i].hp_max;
 	ennemi->largeur = DataEnnemi[i].largeur;
+
+	InitSprite(&ennemi->self, jeu);
 	ennemi->self.couleure = DataEnnemi[i].couleure;
 	ennemi->self.indexs_de_tir[0] = DataEnnemi[i].indexs_tir[0];
 	ennemi->self.indexs_de_tir[1] = DataEnnemi[i].indexs_tir[1];

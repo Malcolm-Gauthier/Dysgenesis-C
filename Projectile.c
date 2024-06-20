@@ -20,6 +20,7 @@ Projectile* CreerProjectile(Jeu* jeu, Vector3 position, Vector3 destination, Pro
 		return NULL;
 	}
 
+	InitSprite(&projectile->self, jeu);
 	projectile->self.afficher = SDL_TRUE;
 
 	projectile->proprietaire = proprietaire;

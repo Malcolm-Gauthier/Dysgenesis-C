@@ -1,11 +1,12 @@
 #pragma once
 #include <SDL.h>
 #include <SDL_mixer.h>
-#include <stdint.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "Ennemi.h"
 #include "Projectile.h"
+#include "Misc.h"
 
 #define G_FPS 60
 #define MAX_PROFONDEUR 50
@@ -40,6 +41,7 @@ typedef struct Vector3 {
 typedef struct Jeu {
 	SDL_Window* fenetre;
 	SDL_Renderer* render;
+	SDL_Event* event;
 
 	Joueur* joueur;
 	Ennemi* ennemis;
@@ -49,10 +51,17 @@ typedef struct Jeu {
 
 	VagueElectrique* vague_electrique;
 	Curseur* curseur;
+	BombePulsar* bombe;
+	Son* son;
 
 	i32 gTimer;
 
+	Vector2* etoiles;
 	SDL_bool bouger_etoiles;
+	SDL_bool en_cours;
+	SDL_bool arcade_debloque;
+	u8 arcade_etapes;
+	clock_t temps_image;
 	Gamemode gamemode;
 	i32 touches_pesees;
 	i32 niveau;
@@ -90,7 +99,15 @@ typedef enum Touches {
 
 int Init(Jeu* jeu);
 
+void Controlles(Jeu* jeu);
+
 void Code(Jeu* jeu);
+
+void Render(Jeu* jeu);
+
+void SDLRender(Jeu* jeu);
+
+void FreeMem(Jeu* jeu);
 
 SDL_bool TouchePesee(Jeu* jeu, Touche touche);
 
@@ -109,6 +126,4 @@ float DistanceV2(Vector2 a, Vector2 b);
 
 i32 RNG(i32 min, i32 max);
 
-SDL_Color RGBAtoSDLColor(u32 RGBA);
-
-void DessinerCercle(Vector2 position, i32 rayon, i32 precision);
+void DessinerCercle(SDL_Renderer* render, Vector2 position, i32 rayon, i32 precision);

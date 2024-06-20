@@ -2,10 +2,6 @@
 
 int CreerJoueur(Joueur* joueur) {
 
-	if (joueur == NULL) {
-		return 1;
-	}
-
 	joueur->self.indexs_de_tir[0] = 1;
 	joueur->self.indexs_de_tir[1] = 16;
 
@@ -21,9 +17,6 @@ int CreerJoueur(Joueur* joueur) {
 
 void InitializerJoueur(Joueur* joueur) {
 
-	if (joueur == NULL)
-		return;
-
 	joueur->HP = JOUEUR_DEFAULT_HP;
 	joueur->powerup = TYPEITEM_NONE;
 	joueur->velocite = (Vector2){ .x = 0, .y = -30 };
@@ -37,9 +30,6 @@ void InitializerJoueur(Joueur* joueur) {
 
 SDL_bool ExistJoueur(Joueur* joueur) {
 
-	if (joueur == NULL)
-		return SDL_TRUE;
-
 	if (JoueurMort(joueur)) {
 
 		AnimationMort(joueur);
@@ -48,7 +38,7 @@ SDL_bool ExistJoueur(Joueur* joueur) {
 
 	BougerJoueur(joueur);
 
-	if (joueur->self.jeu->bombepulsar.hp <= 0) {
+	if (joueur->self.jeu->bombe->HP <= 0) {
 
 		return SDL_FALSE;
 	}
@@ -151,9 +141,9 @@ static void AnimationMort(Joueur* joueur) {
 		joueur->self.indexs_lignes_sauter = lignes_a_sauter_temporaire;
 	}
 
-	if (joueur->self.timer < UINT8_MAX) {
+	if (joueur->self.timer < SDL_MAX_UINT8) {
 
-		joueur->self.couleure.a = (u8)(UINT8_MAX - joueur->self.timer);
+		joueur->self.couleure.a = (u8)(SDL_MAX_UINT8 - joueur->self.timer);
 		joueur->self.position.x += JOUEUR_MORT_VITESSE_X;
 		joueur->self.position.y += JOUEUR_MORT_VITESSE_Y;
 		joueur->self.roll += JOUEUR_MORT_VITESSE_ROLL;

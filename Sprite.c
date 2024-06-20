@@ -11,7 +11,7 @@ int InitSprite(Sprite* sprite, Jeu* jeu) {
 	sprite->couleure = (SDL_Color){ .r = 255,.g = 255,.b = 255,.a = 255 };
 	sprite->indexs_de_tir[0] = -1;
 	sprite->indexs_de_tir[1] = -1;
-	sprite->indexs_lignes_sauter = NULL;
+	sprite->indexs_lignes_sauter = &SAUTS_MODELE_AUCUN;
 	sprite->modele = NULL;
 	sprite->modele_longueur = 0;
 	sprite->pitch = 0;
