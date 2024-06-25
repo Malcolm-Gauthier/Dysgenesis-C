@@ -107,6 +107,425 @@ int Init(Jeu* jeu) {
 	return 0;
 }
 
+void Controlles(Jeu* jeu) {
+
+	while (SDL_PollEvent(jeu->event)) {
+
+		if (jeu->event->type == SDL_QUIT) {
+
+			jeu->en_cours = SDL_FALSE;
+			return;
+		}
+		else if (jeu->event->type == SDL_KEYDOWN) {
+
+			switch (jeu->event->key.keysym.sym) {
+
+			case SDLK_ESCAPE:
+				jeu->en_cours = SDL_FALSE;
+				return;
+
+			case SDLK_w:
+				jeu->touches_pesees |= TOUCHE_W;
+				break;
+
+			case SDLK_a:
+				jeu->touches_pesees |= TOUCHE_A;
+				break;
+
+			case SDLK_s:
+				jeu->touches_pesees |= TOUCHE_S;
+				break;
+
+			case SDLK_d:
+				jeu->touches_pesees |= TOUCHE_D;
+				break;
+
+			case SDLK_j:
+				jeu->touches_pesees |= TOUCHE_J;
+				break;
+
+			case SDLK_k:
+				jeu->touches_pesees |= TOUCHE_K;
+				break;
+
+			case SDLK_r:
+				jeu->touches_pesees |= TOUCHE_R;
+				break;
+
+			case SDLK_c:
+				jeu->touches_pesees |= TOUCHE_C;
+				break;
+
+			case SDLK_e:
+				jeu->touches_pesees |= TOUCHE_E;
+				break;
+
+			case SDLK_MINUS:
+				jeu->touches_pesees |= TOUCHE_MOINS;
+				break;
+
+			case SDLK_EQUALS:
+				jeu->touches_pesees |= TOUCHE_PLUS;
+				break;
+
+			case SDLK_m:
+				jeu->touches_pesees |= TOUCHE_M;
+				break;
+			}
+		}
+		else if (jeu->event->type == SDL_KEYUP) {
+
+			switch (jeu->event->key.keysym.sym) {
+
+			case SDLK_ESCAPE:
+				jeu->en_cours = SDL_FALSE;
+				return;
+
+			case SDLK_w:
+				jeu->touches_pesees &= ~TOUCHE_W;
+				break;
+
+			case SDLK_a:
+				jeu->touches_pesees &= ~TOUCHE_A;
+				break;
+
+			case SDLK_s:
+				jeu->touches_pesees &= ~TOUCHE_S;
+				break;
+
+			case SDLK_d:
+				jeu->touches_pesees &= ~TOUCHE_D;
+				break;
+
+			case SDLK_j:
+				jeu->touches_pesees &= ~TOUCHE_J;
+				break;
+
+			case SDLK_k:
+				jeu->touches_pesees &= ~TOUCHE_K;
+				break;
+
+			case SDLK_r:
+				jeu->touches_pesees &= ~TOUCHE_R;
+				break;
+
+			case SDLK_c:
+				jeu->touches_pesees &= ~TOUCHE_C;
+				break;
+
+			case SDLK_e:
+				jeu->touches_pesees &= ~TOUCHE_E;
+				break;
+
+			case SDLK_MINUS:
+				jeu->touches_pesees &= ~TOUCHE_MOINS;
+				break;
+
+			case SDLK_EQUALS:
+				jeu->touches_pesees &= ~TOUCHE_PLUS;
+				break;
+
+			case SDLK_m:
+				jeu->touches_pesees &= ~TOUCHE_M;
+				break;
+			}
+		}
+	}
+}
+
+void Code(Jeu* jeu) {
+
+	ChangerVolume(jeu);
+
+	if (jeu->gamemode == GAMEMODE_SCENE_INITIALIZATION || jeu->gamemode == GAMEMODE_SCENE_GENERIQUE) {
+
+		return;
+	}
+
+	if (jeu->bouger_etoiles) {
+
+		BougerEtoiles(jeu->etoiles, DENSITE_ETOILES);
+	}
+
+	if (jeu->gamemode == GAMEMODE_MENU_PRINCIPAL) {
+
+		if (!jeu->arcade_debloque) {
+
+			if (!TouchePesee(jeu, CODE_ARCADE[jeu->arcade_etapes]) && TouchePesee(jeu, CODE_ARCADE[jeu->arcade_etapes + 1])) {
+
+				jeu->arcade_etapes++;
+				JouerEffet(jeu, EFFET_EXPLOSION_ENNEMI);
+
+				if (jeu->arcade_etapes >= sizeof(CODE_ARCADE) / sizeof(CODE_ARCADE[0]) - 1) {
+
+					jeu->arcade_debloque = SDL_TRUE;
+					jeu->debug_lvl_select = SDL_TRUE;
+					jeu->curseur->max_selection = 3;
+				}
+			}
+			else if (TouchePesee(jeu, TOUCHES_VALIDES_ARCADE - CODE_ARCADE[jeu->arcade_etapes] - CODE_ARCADE[jeu->arcade_etapes + 1])) {
+
+				jeu->arcade_etapes = 0;
+			}
+		}
+
+		if (jeu->debug_lvl_select && jeu->gTimer % 10 == 0) {
+
+			if (TouchePesee(jeu, TOUCHE_A) && jeu->niveau_continue > 1) {
+
+				jeu->niveau_continue--;
+			}
+			else if (TouchePesee(jeu, TOUCHE_D) && jeu->niveau_continue < 20) {
+
+				jeu->niveau_continue++;
+			}
+		}
+
+		if (ExistCurseur(jeu->curseur)) {
+
+			switch (jeu->curseur->selection) {
+
+			case CURSEUR_NOUVELLE_PARTIE:
+				Mix_HaltMusic();
+				jeu->niveau = 0;
+				InitializerJoueur(jeu->joueur);
+				jeu->joueur->self.afficher = SDL_TRUE;
+				jeu->gamemode = GAMEMODE_AVENTURE;
+				jeu->gTimer = 0;
+				break;
+
+			case CURSEUR_CONTINUER:
+				Mix_HaltMusic();
+				jeu->niveau = jeu->niveau_continue - 1;
+				jeu->ennemis_tues = ARRAY_LEN(liste_niveaux[jeu->niveau]);
+				jeu->ennemis_restant = 0;
+
+				InitializerJoueur(jeu->joueur);
+				jeu->joueur->self.afficher = SDL_TRUE;
+
+				jeu->joueur->HP = JOUEUR_MAX_HP / 2;
+				jeu->joueur->vagues_electriques = 0;
+
+				jeu->gamemode = GAMEMODE_AVENTURE;
+				jeu->gTimer = 0;
+				break;
+
+			case CURSEUR_ARCADE:
+				jeu->niveau = 0;
+				InitializerJoueur(jeu->joueur);
+				jeu->joueur->self.afficher = SDL_TRUE;
+				JouerMusique(jeu, MUSIQUE_DCQBPM, SDL_TRUE);
+				jeu->gamemode = GAMEMODE_ARCADE;
+				jeu->gTimer = 0;
+				break;
+
+			default:
+				break;
+			}
+		}
+
+		if (TouchePesee(jeu, TOUCHE_M)) {
+
+			jeu->timer_changement_niveau++;
+
+			if (jeu->timer_changement_niveau >= 120) {
+
+				Mix_HaltMusic();
+				jeu->gamemode = GAMEMODE_SCENE_GENERIQUE;
+				jeu->gTimer = 0;
+				jeu->timer_changement_niveau = 0;
+			}
+		}
+		else {
+
+			jeu->timer_changement_niveau = 0;
+		}
+	}
+
+	if (!GamemodeAction(jeu)) {
+
+		return;
+	}
+
+	for (int i = 0; i < NB_ENNEMIS; i++) {
+
+		if (jeu->ennemis[i].self.afficher == SDL_FALSE) {
+
+			continue;
+		}
+
+		ExistEnnemi(&jeu->ennemis[i]);
+	}
+
+	if (jeu->ennemis[0].type == TYPEENNEMI_BOSS) {
+
+		ExistBombe(jeu->bombe);
+	}
+
+	if (ExistJoueur(jeu->joueur)) {
+
+		return;
+	}
+
+	if (TouchePesee(jeu, TOUCHE_K)) {
+
+		CreerVagueElectrique(jeu->vague_electrique);
+	}
+	ExistVagueElectrique(jeu->vague_electrique);
+
+	if (jeu->niveau == -1)
+		jeu->niveau = 0;
+
+	int timer_enemy_spawn = 400 / (jeu->niveau + 1);
+	if (jeu->gTimer % timer_enemy_spawn == timer_enemy_spawn - 1 &&
+		jeu->ennemis_restant > 0 && !JoueurMort(jeu->joueur)) {
+
+		int verif = NbEnnemis(jeu);
+
+		if (jeu->gamemode == GAMEMODE_AVENTURE) {
+
+			CreerEnnemi(jeu, (liste_niveaux[jeu->niveau])[jeu->ennemis_restant - 1], STATUSENNEMI_INITIALIZATION, NULL);
+		}
+		else {
+
+			CreerEnnemi(jeu, jeu->liste_ennemis_arcade[jeu->ennemis_restant - 1], STATUSENNEMI_INITIALIZATION, NULL);
+		}
+
+		if (NbEnnemis(jeu) > verif) {
+
+			jeu->ennemis_restant--;
+		}
+	}
+
+	if (NbEnnemis(jeu) == 0) {
+
+		if (1) {
+
+			ChangerNiveau(jeu);
+		}
+	}
+
+	for (int i = 0; i < NB_PROJECTILES; i++) {
+
+		if (jeu->projectiles[i].self.afficher == SDL_FALSE) {
+
+			continue;
+		}
+
+		ExistProjectile(&jeu->projectiles[i]);
+	}
+	son_cree = SDL_FALSE;
+
+	for (int i = 0; i < NB_ITEMS; i++) {
+
+		if (jeu->items[i].self.afficher == SDL_FALSE) {
+
+			continue;
+		}
+
+		ItemExist(&jeu->items[i]);
+	}
+
+	for (int i = 0; i < NB_EXPLOSIONS; i++) {
+
+		if (jeu->explosions[i].timer == 0) {
+
+			continue;
+		}
+
+		ExistExplosion(&jeu->explosions[i]);
+	}
+
+	CLAMP(jeu->joueur->HP, 0, JOUEUR_MAX_HP);
+	CLAMP(jeu->joueur->vagues_electriques, 0, JOUEUR_MAX_VAGUES);
+}
+
+void Render(Jeu* jeu) {
+
+	if (jeu->gamemode >= GAMEMODE_SCENE_INITIALIZATION) {
+
+		switch (jeu->gamemode) {
+
+		case GAMEMODE_SCENE_INITIALIZATION:
+			Scene0(jeu, jeu->gTimer);
+			break;
+
+		case GAMEMODE_SCENE_GENERIQUE:
+			Scene4(jeu, jeu->gTimer);
+			break;
+
+		default:
+			break;
+		}
+
+		return;
+	}
+
+	if (GamemodeAction(jeu)) {
+
+		RenderEtoiles(jeu->render, jeu->etoiles, DENSITE_ETOILES);
+
+		if (jeu->ennemis[0].type == TYPEENNEMI_BOSS) {
+
+			DessinerBombePulsar(jeu->render,
+				(Vector2) {
+				W_SEMI_LARGEUR, W_SEMI_HAUTEUR / 2
+			},
+				(u8)(25 - jeu->ennemis[0].self.position.z / 4),
+				COULEUR_BOMBE,
+				SDL_TRUE
+			);
+		}
+
+		for (int i = 0; i < NB_ENNEMIS; i++) {
+
+			if (jeu->ennemis[i].self.afficher == SDL_FALSE) {
+
+				continue;
+			}
+
+			RenderEnnemi(&jeu->ennemis[i]);
+		}
+
+		for (int i = 0; i < NB_PROJECTILES; i++) {
+
+			if (jeu->projectiles[i].self.afficher == SDL_FALSE) {
+
+				continue;
+			}
+
+			RenderProjectile(&jeu->projectiles[i]);
+		}
+
+		for (int i = 0; i < NB_ITEMS; i++) {
+
+			if (jeu->items[i].self.afficher == SDL_FALSE) {
+
+				continue;
+			}
+
+			RenderItem(&jeu->items[i]);
+		}
+
+		for (int i = 0; i < NB_EXPLOSIONS; i++) {
+
+			if (jeu->explosions[i].timer == 0) {
+
+				continue;
+			}
+
+			RenderExplosion(&jeu->explosions[i]);
+		}
+
+		RenderSprite(&jeu->joueur->self);
+
+		if (jeu->bombe->HP <= 0) {
+
+			return;
+		}
+	}
+}
+
 
 
 

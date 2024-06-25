@@ -7,6 +7,20 @@
 #include "Ennemi.h"
 #include "Projectile.h"
 #include "Misc.h"
+#include "Niveaux.h"
+#include "Sprite.h"
+#include "Item.h"
+#include "Joueur.h"
+
+#define ARRAY_LEN(fixed_len_array) (sizeof(fixed_len_array) / sizeof((fixed_len_array)[0]))
+#define CLAMP(num, minimum, maximum) (((num) < (minimum)) ? ((num) = (minimum)) : (((num) > (maximum)) ? ((num) = (maximum)) : 0))
+
+typedef int8_t i8;
+typedef uint8_t u8;
+typedef int16_t i16;
+typedef uint16_t u16;
+typedef int32_t i32;
+typedef uint32_t u32;
 
 #define G_FPS 60
 #define MAX_PROFONDEUR 50
@@ -20,12 +34,10 @@
 #define NB_ITEMS 10
 #define NB_EXPLOSIONS 30
 
-typedef int8_t i8;
-typedef uint8_t u8;
-typedef int16_t i16;
-typedef uint16_t u16;
-typedef int32_t i32;
-typedef uint32_t u32;
+const SDL_Rect BARRE_HP = { .x = 125, .y = 15, .w = 10, .h = 20 };
+const SDL_Rect BARRE_VAGUE = { .x = 125, .y = 40, .w = 100, .h = 20 };
+const i32 CODE_ARCADE[7] = { 0, TOUCHE_A, TOUCHE_R, TOUCHE_C, TOUCHE_A, TOUCHE_D, TOUCHE_E };
+const i32 TOUCHES_VALIDES_ARCADE = TOUCHE_A | TOUCHE_R | TOUCHE_C | TOUCHE_A | TOUCHE_D | TOUCHE_E;
 
 typedef struct Vector2 {
 	float x;
@@ -57,9 +69,12 @@ typedef struct Jeu {
 	i32 gTimer;
 
 	Vector2* etoiles;
+	TypeEnnemi* liste_ennemis_arcade;
+	i32 timer_changement_niveau;
 	SDL_bool bouger_etoiles;
 	SDL_bool en_cours;
 	SDL_bool arcade_debloque;
+	SDL_bool debug_lvl_select;
 	u8 arcade_etapes;
 	clock_t temps_image;
 	Gamemode gamemode;

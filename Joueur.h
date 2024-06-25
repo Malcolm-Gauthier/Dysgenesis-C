@@ -1,6 +1,4 @@
 #pragma once
-#include "Sprite.h"
-#include "Item.h"
 #include "Dysgenesis.h"
 
 const float JOUEUR_MAX_VAGUES = 3.0f;
