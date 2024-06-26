@@ -39,6 +39,9 @@
     <ClCompile Include="Sprite.c">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="Definitions.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

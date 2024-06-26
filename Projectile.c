@@ -35,7 +35,7 @@ Projectile* CreerProjectile(Jeu* jeu, Vector3 position, Vector3 destination, Pro
 
 		if (GamemodeAction(jeu) && !son_cree) {
 
-			JouerEffet(EFFET_TIR);
+			JouerEffet(jeu, EFFET_TIR);
 			son_cree = SDL_TRUE;
 		}
 
@@ -88,7 +88,7 @@ void TrouverCible(Projectile* projectile) {
 		return;
 	}
 
-	i32 plus_petite_distance = INT32_MAX;
+	i32 plus_petite_distance = SDL_MAX_SINT32;
 	float distance;
 
 	Ennemi* ennemi_plus_proche;
@@ -108,7 +108,7 @@ void TrouverCible(Projectile* projectile) {
 		}
 	}
 
-	if (plus_petite_distance == INT32_MAX) {
+	if (plus_petite_distance == SDL_MAX_SINT32) {
 
 		return;
 	}
@@ -197,7 +197,7 @@ int CollisionProjectileJoueur(Projectile* projectile) {
 	}
 
 	joueur->HP--;
-	CreerExplosion(joueur->self.position);
+	CreerExplosion(projectile->self.jeu, joueur->self.position);
 	projectile->self.afficher = SDL_FALSE;
 
 	if (!JoueurMort(joueur)) {
@@ -208,8 +208,8 @@ int CollisionProjectileJoueur(Projectile* projectile) {
 	Mix_HaltMusic();
 	joueur->self.timer = 0;
 
-	if (projectile->self.jeu->curseur.max_selection < 2)
-		projectile->self.jeu->curseur.max_selection = 2;
+	if (projectile->self.jeu->curseur->max_selection < 2)
+		projectile->self.jeu->curseur->max_selection = 2;
 
 	if (projectile->self.jeu->gamemode == GAMEMODE_AVENTURE)
 		projectile->self.jeu->niveau_continue = projectile->self.jeu->niveau;
@@ -325,7 +325,7 @@ int CreerVagueElectrique(VagueElectrique* vague) {
 	vague->self.timer = 0;
 	vague->rayon = 0;
 	vague->self.afficher = SDL_TRUE;
-	JouerEffet(EFFET_VAGUE);
+	JouerEffet(vague->self.jeu, EFFET_VAGUE);
 
 	return 0;
 }

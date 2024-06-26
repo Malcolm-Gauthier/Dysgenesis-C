@@ -191,7 +191,7 @@ int VerifierCollisionJoueur(Item* item) {
 	}
 
 	item->self.afficher = SDL_FALSE;
-	JouerEffet(EFFET_POWERUP);
+	JouerEffet(item->self.jeu, EFFET_POWERUP);
 
 	return 1;
 }
@@ -206,7 +206,7 @@ void RenderItem(Item* item) {
 
 		for (int i = 0; i < 3; i++) {
 
-			DessinerCercle((Vector2) { .x = item->self.position.x, .y = item->self.position.y }, (i32)((30 - i * 4) * pronfondeur), 50);
+			DessinerCercle(item->self.jeu->render, (Vector2) { .x = item->self.position.x, .y = item->self.position.y }, (i32)((30 - i * 4) * pronfondeur), 50);
 		}
 
 		return;

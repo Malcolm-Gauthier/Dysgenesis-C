@@ -8,6 +8,7 @@ int main() {
 	if (i = Init(jeu)) {
 
 		FreeMem(jeu);
+		Mix_Quit();
 		SDL_Quit();
 		return i;
 	}
@@ -28,6 +29,7 @@ int main() {
 	}
 
 	FreeMem(jeu);
+	Mix_Quit();
 	SDL_Quit();
 
 	return 0;
@@ -523,7 +525,150 @@ void Render(Jeu* jeu) {
 
 			return;
 		}
+
+		RenderVagueElectrique(jeu->vague_electrique);
+
+		SDL_Rect barre_hud = BARRE_HP;
+		for (int i = 0; i < jeu->joueur->HP; i++)
+		{
+			if (i <= 20)
+				SDL_SetRenderDrawColor(jeu->render, 255, 0, 0, 255);
+			else if (i <= 50)
+				SDL_SetRenderDrawColor(jeu->render, 255, 255, 0, 255);
+			else if (i <= 100)
+				SDL_SetRenderDrawColor(jeu->render, 64, 255, 64, 255);
+			else
+				SDL_SetRenderDrawColor(jeu->render, 0, 0, 255, 255);
+			SDL_RenderFillRect(jeu->render, &barre_hud);
+			barre_hud.x += barre_hud.w + 1;
+		}
+
+		barre_hud = BARRE_VAGUE;
+		int vagues_entiers = (int)SDL_floorf(jeu->joueur->vagues_electriques);
+		SDL_SetRenderDrawColor(jeu->render, 0, 255, 255, 255);
+		for (int i = vagues_entiers; i > 0; i--)
+		{
+			SDL_RenderFillRect(jeu->render, &barre_hud);
+			barre_hud.x += barre_hud.w + 5;
+		}
+
+		float vagues_reste = roundf(jeu->joueur->vagues_electriques, 1.0f);
+		barre_hud.w = (int)(roundf(vagues_reste, 2) * 100);
+		SDL_RenderFillRect(jeu->render, &barre_hud);
+
+		DisplayText(jeu, "    hp:\nvagues:", (Vector2) { 10, 15 }, 2, BLANC, OPAQUE, NO_SCROLL);
+
+		if (jeu->ennemis[0].type == TYPEENNEMI_BOSS) {
+
+			DisplayText(jeu, "    hp:\nennemi:", (Vector2) { 10, 85 }, 2, BLANC, OPAQUE, NO_SCROLL);
+			barre_hud = BARRE_HP;
+			barre_hud.y += 70;
+			for (int i = 0; i < jeu->ennemis[0].HP; i++)
+			{
+				if (i <= 20)
+					SDL_SetRenderDrawColor(jeu->render, 255, 0, 0, 255);
+				else if (i <= 50)
+					SDL_SetRenderDrawColor(jeu->render, 255, 255, 0, 255);
+				else
+					SDL_SetRenderDrawColor(jeu->render, 64, 255, 64, 255);
+
+				SDL_RenderFillRect(jeu->render, &barre_hud);
+				barre_hud.x += barre_hud.w + 1;
+			}
+		}
+
+		if (jeu->gamemode == GAMEMODE_AVENTURE && jeu->niveau < 2) {
+
+			DisplayText(jeu,
+				"controles:\n\
+				wasd pour bouger\n\
+				j pour tirer\n\
+				k pour activer une vague électrique",
+				(Vector2) {W_SEMI_LARGEUR - 300, W_SEMI_HAUTEUR + 100}, 2, BLANC, OPAQUE, NO_SCROLL
+			);
+		}
+
+		return;
 	}
+
+	if (jeu->gamemode == GAMEMODE_MENU_PRINCIPAL) {
+
+		RenderEtoiles(jeu->render, jeu->etoiles, DENSITE_ETOILES);
+
+		DisplayText(jeu, "dysgenesis",
+			(Vector2) { CENTRE, CENTRE }, 5, BLANC, OPAQUE, NO_SCROLL );
+
+		DisplayText(jeu, "nouvelle partie",
+			(Vector2) {
+			W_SEMI_LARGEUR - 114, W_SEMI_HAUTEUR + 75
+		}, 2, BLANC, OPAQUE, NO_SCROLL);
+
+		DisplayText(jeu, "controles menu: w et s pour bouger le curseur,\
+			j pour sélectionner\n\ncontroles globaux: esc. pour quitter,\
+			+/- pour monter ou baisser le volume",
+			(Vector2) {
+			10, W_SEMI_HAUTEUR - 40
+		}, 1, BLANC, OPAQUE, NO_SCROLL);
+
+		DisplayText(jeu, "v 0.3c (beta)",
+			(Vector2) {
+			W_SEMI_LARGEUR - 200, W_SEMI_HAUTEUR - 30
+		}, 2, BLANC, OPAQUE, NO_SCROLL);
+
+		if (jeu->curseur->max_selection >= 2) {
+
+			char nb[3];
+			SDL_itoa(jeu->niveau_continue, nb, 10);
+			char txt[25] = "continuer: niveau ";
+			SDL_strlcat(txt, nb, 25);
+
+			DisplayText(jeu, txt,
+				(Vector2) {
+				W_SEMI_LARGEUR - 114, W_SEMI_HAUTEUR + 125
+			}, 2, BLANC, OPAQUE, NO_SCROLL);
+		}
+		
+		if (jeu->curseur->max_selection >= 3) {
+
+			DisplayText(jeu, "arcade",
+				(Vector2) {
+				W_SEMI_LARGEUR - 114, W_SEMI_HAUTEUR + 175
+			}, 2, BLANC, OPAQUE, NO_SCROLL);
+		}
+
+		RenderSprite(jeu->curseur);
+	}
+}
+
+void SDLRender(Jeu* jeu) {
+
+	RenderVolume(jeu->son);
+
+	SDL_SetRenderDrawColor(jeu->render, jeu->couleure_fond_ecran.r, jeu->couleure_fond_ecran.g, jeu->couleure_fond_ecran.b, jeu->couleure_fond_ecran.a);
+	SDL_RenderPresent(jeu->render);
+	SDL_RenderClear(jeu->render);
+}
+
+void FreeMem(Jeu* jeu) {
+
+	SDL_free(jeu->joueur);
+	SDL_free(jeu->ennemis);
+	SDL_free(jeu->projectiles);
+	SDL_free(jeu->explosions);
+	SDL_free(jeu->items);
+
+	SDL_free(jeu->vague_electrique);
+	SDL_free(jeu->bombe);
+	SDL_free(jeu->son);
+	SDL_free(jeu->curseur);
+
+	SDL_DestroyRenderer(jeu->render);
+	SDL_DestroyWindow(jeu->fenetre);
+	Mix_FreeMusic(jeu->son->musique);
+	for (int i = 0; i < NB_CHAINES_SFX + 1; i++) Mix_FreeChunk(jeu->son->effets_sonnores[i]);
+	Mix_CloseAudio();
+
+	SDL_free(jeu);
 }
 
 

@@ -383,48 +383,48 @@ SDL_bool CodeBoss(Ennemi* ennemi) {
 
 		if (ennemi->self.timer < 240) {
 
-			AfficherText("allo pilote. ton vaisseau n'est pas le seul.",
+			DisplayText(ennemi->self.jeu, "allo pilote. ton vaisseau n'est pas le seul.",
 				(Vector2) {
-				TEXT_CENTRE, W_SEMI_HAUTEUR + 250
-			}, 2, TEXT_BLANC, TEXT_OPAQUE, ennemi->self.timer / 2);
+				CENTRE, W_SEMI_HAUTEUR + 250
+			}, 2, BLANC, OPAQUE, ennemi->self.timer / 2);
 		}
 		else if (ennemi->self.timer >= 260 && ennemi->self.timer < 480) {
 
-			AfficherText("un espion nous a transféré les plans.",
+			DisplayText(ennemi->self.jeu, "un espion nous a transféré les plans.",
 				(Vector2) {
-				TEXT_CENTRE, W_SEMI_HAUTEUR + 250
-			}, 2, TEXT_BLANC, TEXT_OPAQUE, ennemi->self.timer / 2 - 130);
+				CENTRE, W_SEMI_HAUTEUR + 250
+			}, 2, BLANC, OPAQUE, ennemi->self.timer / 2 - 130);
 		}
 		else if (ennemi->self.timer >= 500 && ennemi->self.timer < 800) {
 
-			AfficherText("la bombe à pulsar est très puissante, et",
+			DisplayText(ennemi->self.jeu, "la bombe à pulsar est très puissante, et",
 				(Vector2) {
-				TEXT_CENTRE, W_SEMI_HAUTEUR + 250
-			}, 2, TEXT_BLANC, TEXT_OPAQUE, ennemi->self.timer / 2 - 250);
+				CENTRE, W_SEMI_HAUTEUR + 250
+			}, 2, BLANC, OPAQUE, ennemi->self.timer / 2 - 250);
 
-			AfficherText("encore plus fragile. je ne peux pas te laisser près d'elle.",
+			DisplayText(ennemi->self.jeu, "encore plus fragile. je ne peux pas te laisser près d'elle.",
 				(Vector2) {
-				TEXT_CENTRE, W_SEMI_HAUTEUR + 288
-			}, 2, TEXT_BLANC, TEXT_OPAQUE, ennemi->self.timer / 2 - 250);
+				CENTRE, W_SEMI_HAUTEUR + 288
+			}, 2, BLANC, OPAQUE, ennemi->self.timer / 2 - 250);
 		}
 		else if (ennemi->self.timer >= 820 && ennemi->self.timer < 1020) {
 
-			AfficherText("que le meilleur pilote gagne. en guarde.",
+			DisplayText(ennemi->self.jeu, "que le meilleur pilote gagne. en guarde.",
 				(Vector2) {
-				TEXT_CENTRE, W_SEMI_HAUTEUR + 250
-			}, 2, TEXT_BLANC, TEXT_OPAQUE, ennemi->self.timer / 2 - 410);
+				CENTRE, W_SEMI_HAUTEUR + 250
+			}, 2, BLANC, OPAQUE, ennemi->self.timer / 2 - 410);
 		}
 
 		if (ennemi->self.timer == 886) {
 
-			JouerEffet(EFFET_DOTV_ENTREE);
+			JouerEffet(ennemi->self.jeu, EFFET_DOTV_ENTREE);
 		}
 
 		if (ennemi->self.timer > 1020) {
 
 			ennemi->statut = STATUSENNEMI_BOSS_NORMAL;
-			ennemi->self.jeu.bombe_pulsar.HP = BOMBE_PULSAR_MAX_HP;
-			JouerMusique(MUSIQUE_DOTV, SDL_TRUE);
+			ennemi->self.jeu->bombe->HP = BOMBE_PULSAR_MAX_HP;
+			JouerMusique(ennemi->self.jeu, MUSIQUE_DOTV, SDL_TRUE);
 		}
 
 		break;
@@ -490,7 +490,7 @@ SDL_bool CodeBoss(Ennemi* ennemi) {
 
 		if (ennemi->self.timer == 302) {
 
-			JouerEffet(EFFET_EXPLOSION_JOUEUR);
+			JouerEffet(ennemi->self.jeu, EFFET_EXPLOSION_JOUEUR);
 		}
 
 		ennemi->self.roll += 0.05f;
@@ -501,7 +501,7 @@ SDL_bool CodeBoss(Ennemi* ennemi) {
 			CreerExplosion(ennemi->self.jeu, (Vector3) { .x = ennemi->self.position.x + RNG(-20, 20), .y = ennemi->self.position.y + RNG(-20, 20), 0 });
 		}
 
-		if (ennemi->self.timer < UINT8_MAX) {
+		if (ennemi->self.timer < SDL_MAX_UINT8) {
 
 			ennemi->self.jeu->couleure_fond_ecran.a = (u8)ennemi->self.timer;
 			ennemi->self.couleure.a = (u8)(0xFF - ennemi->self.timer);
@@ -808,6 +808,7 @@ void RenderEnnemi(Ennemi* ennemi) {
 	if (ennemi->type == TYPEENNEMI_ENERGIE || ennemi->type == TYPEENNEMI_ENERGIE_DUR) {
 
 		DessinerBombePulsar(
+			ennemi->self.jeu->render,
 			(Vector2) { ennemi->self.position.x, ennemi->self.position.y },
 			(u8)(40 * SDL_powf(0.95f, ennemi->self.position.z)),
 			ennemi->self.couleure,

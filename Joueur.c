@@ -122,7 +122,7 @@ static void AnimationMort(Joueur* joueur) {
 
 	if (joueur->self.timer == 1) {
 
-		JouerEffet();
+		JouerEffet(joueur->self.jeu, EFFET_EXPLOSION_JOUEUR);
 		joueur->self.jeu->bouger_etoiles = SDL_TRUE;
 
 		i32* lignes_a_sauter_temporaire = malloc(sizeof(i32) * joueur->self.modele_longueur);
@@ -168,7 +168,7 @@ static void AnimationMort(Joueur* joueur) {
 		joueur->self.indexs_lignes_sauter = NULL;
 		free(lignes_a_sauter_temporaire);
 
-		JouerMusique(0);
+		JouerMusique(joueur->self.jeu, MUSIQUE_DYSGENESIS, SDL_TRUE);
 		joueur->self.jeu->bouger_etoiles = SDL_TRUE;
 		//vider ennemis, explosions & projectiles
 		joueur->self.jeu->gamemode = GAMEMODE_MENU_PRINCIPAL;
