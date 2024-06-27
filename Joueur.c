@@ -1,7 +1,9 @@
 #include "Joueur.h"
 #include "Misc.h"
 
-int CreerJoueur(Joueur* joueur) {
+int CreerJoueur(Jeu* jeu, Joueur* joueur) {
+
+	joueur->self.jeu = jeu;
 
 	joueur->self.indexs_de_tir[0] = 1;
 	joueur->self.indexs_de_tir[1] = 16;

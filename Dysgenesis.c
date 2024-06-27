@@ -58,6 +58,9 @@ int Init(Jeu* jeu) {
 	jeu->vague_electrique = SDL_malloc(sizeof(VagueElectrique));
 	jeu->bombe = SDL_malloc(sizeof(BombePulsar));
 	jeu->son = SDL_malloc(sizeof(Son));
+	jeu->event = SDL_malloc(sizeof(SDL_Event));
+	jeu->etoiles = SDL_malloc(sizeof(Vector2) * DENSITE_ETOILES);
+	jeu->curseur = SDL_malloc(sizeof(Curseur));
 
 	if (!jeu->joueur || !jeu->explosions || !jeu->ennemis || !jeu->projectiles || !jeu->items || !jeu->vague_electrique || !jeu->bombe || !jeu->son) {
 
@@ -104,7 +107,7 @@ int Init(Jeu* jeu) {
 		return 8;
 	}
 
-	CreerJoueur(jeu->joueur);
+	CreerJoueur(jeu, jeu->joueur);
 	for (int i = 0; i < NB_ENNEMIS; i++) jeu->ennemis[i].self.afficher = SDL_FALSE;
 	for (int i = 0; i < NB_EXPLOSIONS; i++) jeu->explosions[i].timer = 0;
 	for (int i = 0; i < NB_PROJECTILES; i++) jeu->projectiles[i].self.afficher = SDL_FALSE;
@@ -112,6 +115,9 @@ int Init(Jeu* jeu) {
 	CreerCurseur(jeu);
 	jeu->vague_electrique->self.afficher = SDL_FALSE;
 	jeu->bombe->jeu = jeu;
+	jeu->bombe->HP = BOMBE_PULSAR_MAX_HP;
+	jeu->gTimer = 0;
+	jeu->gamemode = GAMEMODE_SCENE_INITIALIZATION;
 
 	return 0;
 }
@@ -617,12 +623,12 @@ void Render(Jeu* jeu) {
 			j pour sélectionner\n\ncontroles globaux: esc. pour quitter,\
 			+/- pour monter ou baisser le volume",
 			(Vector2) {
-			10, W_SEMI_HAUTEUR - 40
+			10, W_HAUTEUR - 40
 		}, 1, BLANC, OPAQUE, NO_SCROLL);
 
 		DisplayText(jeu, "v 0.3c (beta)",
 			(Vector2) {
-			W_SEMI_LARGEUR - 200, W_SEMI_HAUTEUR - 30
+			CENTRE, W_HAUTEUR - 30
 		}, 2, BLANC, OPAQUE, NO_SCROLL);
 
 		if (jeu->curseur->max_selection >= 2) {
@@ -671,6 +677,8 @@ void FreeMem(Jeu* jeu) {
 	SDL_free(jeu->bombe);
 	SDL_free(jeu->son);
 	SDL_free(jeu->curseur);
+	SDL_free(jeu->event);
+	SDL_free(jeu->etoiles);
 
 	SDL_DestroyRenderer(jeu->render);
 	SDL_DestroyWindow(jeu->fenetre);

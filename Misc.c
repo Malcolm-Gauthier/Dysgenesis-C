@@ -138,7 +138,7 @@ void ExistBombe(BombePulsar* bombe) {
 
 int CreerEtoiles(Vector2* etoiles, i32 limite, SDL_Rect bounds) {
 
-    if (etoiles != NULL) {
+    /*if (etoiles != NULL) {
 
         SDL_free(etoiles);
     }
@@ -148,7 +148,7 @@ int CreerEtoiles(Vector2* etoiles, i32 limite, SDL_Rect bounds) {
     if (etoiles == NULL) {
 
         return 1;
-    }
+    }*/
 
     if (bounds.w <= 0 || bounds.h <= 0) {
 
@@ -611,11 +611,11 @@ void DisplayText(Jeu* jeu, char* text, Vector2 position, float size, int color, 
 
 #define MODELE_CURSEUR_LONGUEURE 5
 const Vector3 curseur_modele[MODELE_CURSEUR_LONGUEURE] = {
-    {-15, -15, 0},
-    {15, 0, 0 },
-    {-15, 15, 0},
-    {-12, 0, 0},
-    {-15, -15, 0}
+    {15, -15, 0},
+    {-15, 0, 0 },
+    {15, 15, 0},
+    {12, 0, 0},
+    {15, -15, 0}
 };
 
 Curseur* CreerCurseur(Jeu* jeu) {
@@ -633,6 +633,8 @@ Curseur* CreerCurseur(Jeu* jeu) {
     curseur->max_selection = 1;
     curseur->option_selectionee = CURSEUR_NOUVELLE_PARTIE;
     curseur->selection = CURSEUR_AUCUN;
+    curseur->self.afficher = SDL_TRUE;
+    curseur->self.position.x = 800;
 
     return curseur;
 }
@@ -792,7 +794,7 @@ int JouerMusique(Jeu* jeu, Musique musique_a_jouer, SDL_bool boucle) {
         return -3;
     }
 
-    if (Mix_PlayMusic(jeu->son->musique, boucle) != 0) {
+    if (Mix_PlayMusic(jeu->son->musique, loupes) != 0) {
 
         return -4;
     }
@@ -827,8 +829,8 @@ int JouerEffet(Jeu* jeu, EffetAudio effet_a_jouer) {
 
         return -3;
     }
-
-    if (Mix_PlayChannel(son->index_prochain_chunk + 1, son->effets_sonnores[son->index_prochain_chunk],0) != 0) {
+    
+    if (Mix_PlayChannel(son->index_prochain_chunk + 1, son->effets_sonnores[son->index_prochain_chunk], 0) != 0) {
 
         return -4;
     }
@@ -872,7 +874,7 @@ void ChangerVolume(Jeu* jeu) {
 
 void RenderVolume(Jeu* jeu) {
 
-    if (jeu->son->timer > 0) {
+    if (jeu->son->timer == 0) {
 
         return;
     }
@@ -882,7 +884,7 @@ void RenderVolume(Jeu* jeu) {
     SDL_SetRenderDrawColor(jeu->render, 255, 255, 255, 255);
     SDL_RenderDrawRect(jeu->render, &boite_volume);
 
-    char* vol = "      ";
+    char vol[20] = "      ";
     char txt[20] = "volume: ";
     SDL_itoa(jeu->son->volume, vol, 10);
     SDL_strlcat(txt, vol, 20);
