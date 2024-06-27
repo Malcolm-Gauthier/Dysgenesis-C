@@ -1,4 +1,5 @@
 #include "Joueur.h"
+#include "Misc.h"
 
 int CreerJoueur(Joueur* joueur) {
 
@@ -78,12 +79,14 @@ static int TirJoueur(Joueur* joueur) {
 		iterations = 6;
 	}
 
-	Projectile* projectiles[6];
+	Projectile* projectiles[6] = { 0 };
 	float ligne[4];
 
 	for (int i = 0; i < iterations; i++) {
 
-		PositionLigneModele(&joueur->self, joueur->self.indexs_de_tir[i % 2], ligne);
+		if (PositionLigneModele(&joueur->self, joueur->self.indexs_de_tir[i % 2], ligne)) {
+			return -1;
+		}
 
 		projectiles[i] = CreerProjectile(
 			joueur->self.jeu,
@@ -152,11 +155,11 @@ static void AnimationMort(Joueur* joueur) {
 
 	if (joueur->self.timer > IMAGES_AVANT_TEXTE) {
 
-		AfficherText("game over", (Vector2) { 0, 0 }, 5, 0, joueur->self.timer - 120, 0);
+		DisplayText(joueur->self.jeu, "game over", (Vector2) { 0, 0 }, 5, 0, joueur->self.timer - 120, 0);
 
 		if (joueur->self.jeu->gamemode == GAMEMODE_ARCADE) {
 
-			AfficherText("0", (Vector2) { 0, 0 }, 5, 0, joueur->self.timer - 120, 0);
+			DisplayText(joueur->self.jeu, "0", (Vector2) { 0, 0 }, 5, 0, joueur->self.timer - 120, 0);
 		}
 	}
 

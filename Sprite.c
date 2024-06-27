@@ -1,5 +1,7 @@
 #include "Sprite.h"
 
+const i32 SAUTS_MODELE_AUCUN = -1;
+
 int InitSprite(Sprite* sprite, Jeu* jeu) {
 
 	if (sprite == NULL || jeu == NULL)

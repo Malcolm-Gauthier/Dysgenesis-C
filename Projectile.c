@@ -1,5 +1,7 @@
 #include "Projectile.h"
 
+const float VITESSE_PROJECTILE = 0.95f;
+
 Projectile* CreerProjectile(Jeu* jeu, Vector3 position, Vector3 destination, ProprietaireProjectile proprietaire, u8 ID) {
 
 	if (jeu == NULL) {
@@ -91,7 +93,7 @@ void TrouverCible(Projectile* projectile) {
 	i32 plus_petite_distance = SDL_MAX_SINT32;
 	float distance;
 
-	Ennemi* ennemi_plus_proche;
+	Ennemi* ennemi_plus_proche = NULL;
 	for (int i = 0; i < NB_ENNEMIS; i++) {
 
 		if (projectile->self.jeu->ennemis[i].self.afficher == SDL_FALSE) {
@@ -108,7 +110,7 @@ void TrouverCible(Projectile* projectile) {
 		}
 	}
 
-	if (plus_petite_distance == SDL_MAX_SINT32) {
+	if (plus_petite_distance == SDL_MAX_SINT32 || ennemi_plus_proche == NULL) {
 
 		return;
 	}

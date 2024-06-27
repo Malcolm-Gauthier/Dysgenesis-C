@@ -38,25 +38,23 @@ typedef struct Vector3 {
 #define NB_ITEMS 10
 #define NB_EXPLOSIONS 30
 
-struct Jeu;
-struct Sprite;
-struct Joueur;
-struct Item;
-struct Ennemi;
-struct Explosion;
-struct Projectile;
-struct Curseur;
-struct BombePulsar;
+typedef struct Jeu Jeu;
+typedef struct Sprite Sprite;
+typedef struct Joueur Joueur;
+typedef struct Item Item;
+typedef struct Ennemi Ennemi;
+typedef struct Explosion Explosion;
+typedef struct Projectile Projectile;
+typedef struct Curseur Curseur;
+typedef struct BombePulsar BombePulsar;
 
-enum TypeEnnemi;
-enum StatusEnnemi;
-enum TypeItem;
-enum OptionsCurseur;
-enum Gamemode;
-enum Touches;
-enum ProprietaireProjectile;
-
-#define SAUTS_MODELE_AUCUN -1
+typedef enum TypeEnnemi TypeEnnemi;
+typedef enum StatusEnnemi StatusEnnemi;
+typedef enum TypeItem TypeItem;
+typedef enum OptionsCurseur OptionsCurseur;
+typedef enum Gamemode Gamemode;
+typedef enum Touches Touches;
+typedef enum ProprietaireProjectile ProprietaireProjectile;
 
 typedef struct Sprite {
 	Jeu* jeu;
@@ -160,243 +158,6 @@ typedef enum StatusEnnemi {
 #define HAUTEUR_DEFAUT 10.0f
 #define ESPACE_DEFAUT 3.0f
 
-const i16 char_draw_info_starting_indexes[] = {
-    1, 18, 47, 60, 81, 98, 111, 132, 145, 158, 171, 184, 193, 210, 223, 240, // a - p
-    257, 278, 299, 320, 329, 342, 351, 368, 377, 386, 399, 420, 433, 454, 471, // q - 4
-    484, 513, 534, 543, 564, 585, 590, 599, 604, 609, 630, 651, 676, 697, 706, // 5 - ??
-    711, 716, 721, 734, 747
-};
-#define CHAR_DRAW_INFO_LEN 756
-const i8 char_draw_info[CHAR_DRAW_INFO_LEN] = {
-    127, // space/unknown
-
-    0, 10, 0, 0, // a
-    0, 0, 5, 0,
-    5, 0, 5, 10,
-    5, 5, 0, 5, 127,
-
-    0, 10, 0, 0, // b
-    0, 0, 5, 0,
-    5, 0, 5, 3,
-    5, 3, 0, 5,
-    0, 5, 5, 7,
-    5, 7, 5, 10,
-    5, 10, 0, 10, 127,
-
-    0, 10, 0, 0, // c
-    0, 0, 5, 0,
-    5, 10, 0, 10, 127,
-
-    0, 10, 0, 0, // d
-    0, 0, 2, 0,
-    2, 10, 0, 10,
-    2, 10, 5, 5,
-    2, 0, 5, 5, 127,
-
-    0, 10, 0, 0, // e
-    0, 0, 5, 0,
-    5, 10, 0, 10,
-    5, 5, 0, 5, 127,
-
-    0, 10, 0, 0, // f
-    0, 0, 5, 0,
-    5, 5, 0, 5, 127,
-
-    0, 10, 0, 0, // g
-    0, 0, 5, 0,
-    5, 10, 0, 10,
-    5, 10, 5, 5,
-    5, 5, 3, 5, 127,
-
-    0, 10, 0, 0, // h
-    5, 0, 5, 10,
-    5, 5, 0, 5, 127,
-
-    0, 0, 5, 0, // i
-    2, 0, 2, 10,
-    5, 10, 0, 10, 127,
-
-    5, 0, 5, 10, // j
-    5, 10, 0, 10,
-    0, 10, 0, 7, 127,
-
-    0, 10, 0, 0, // k
-    0, 5, 5, 0,
-    0, 5, 5, 10, 127,
-
-    0, 10, 0, 0, // l
-    5, 10, 0, 10, 127,
-
-    0, 10, 0, 0, // m
-    5, 0, 5, 10,
-    0, 0, 2, 5,
-    5, 0, 2, 5, 127,
-
-    0, 10, 0, 0, // n
-    5, 0, 5, 10,
-    0, 0, 5, 10, 127,
-
-    0, 10, 0, 0, // o
-    5, 0, 5, 10,
-    0, 0, 5, 0,
-    5, 10, 0, 10, 127,
-
-    0, 10, 0, 0, // p
-    0, 0, 5, 0,
-    5, 0, 5, 5,
-    5, 5, 0, 5, 127,
-
-    0, 10, 0, 0, // q
-    4, 0, 4, 10,
-    0, 0, 4, 0,
-    4, 10, 0, 10,
-    5, 10, 3, 5, 127,
-
-    0, 10, 0, 0, // r
-    0, 0, 5, 0,
-    5, 0, 5, 5,
-    5, 5, 0, 5,
-    2, 5, 5, 10, 127,
-
-    0, 0, 5, 0, // s
-    5, 10, 0, 10,
-    5, 5, 0, 5,
-    0, 0, 0, 5,
-    5, 10, 5, 5, 127,
-
-    2, 0, 2, 10, // t
-    0, 0, 5, 0, 127,
-
-    0, 10, 0, 0, // u
-    5, 0, 5, 10,
-    5, 10, 0, 10, 127,
-
-    0, 0, 2, 10, // v
-    5, 0, 2, 10, 127,
-
-    0, 10, 0, 0, // w
-    5, 0, 5, 10,
-    5, 10, 0, 10,
-    2, 10, 2, 4, 127,
-
-    0, 0, 5, 10, // x
-    5, 0, 0, 10, 127,
-
-    5, 0, 0, 10, // y
-    0, 0, 2, 5, 127,
-
-    0, 0, 5, 0, // z
-    5, 10, 0, 10,
-    5, 0, 0, 10, 127,
-
-    5, 0, 0, 10, // 0
-    0, 10, 0, 0,
-    5, 0, 5, 10,
-    0, 0, 5, 0,
-    5, 10, 0, 10, 127,
-
-    0, 3, 2, 0, // 1
-    2, 0, 2, 10,
-    5, 10, 0, 10, 127,
-
-    0, 3, 1, 0, // 2
-    1, 0, 4, 0,
-    5, 3, 4, 0,
-    5, 3, 0, 10,
-    5, 10, 0, 10, 127,
-
-    5, 10, 5, 0, // 3
-    0, 0, 5, 0,
-    5, 10, 0, 10,
-    5, 5, 0, 5, 127,
-
-    0, 5, 0, 0, // 4
-    5, 0, 5, 10,
-    5, 5, 0, 5, 127,
-
-    5, 0, 0, 0, // 5
-    0, 5, 0, 0,
-    5, 5, 0, 5,
-    5, 5, 5, 8,
-    5, 8, 4, 10,
-    4, 10, 1, 10,
-    1, 10, 0, 8, 127,
-
-    0, 10, 0, 0, // 6
-    0, 0, 5, 0,
-    5, 10, 0, 10,
-    5, 10, 5, 5,
-    5, 5, 0, 5, 127,
-
-    5, 0, 0, 0, // 7
-    5, 0, 0, 10, 127,
-
-    5, 5, 0, 5, // 8
-    0, 10, 0, 0,
-    5, 0, 5, 10,
-    0, 0, 5, 0,
-    5, 10, 0, 10, 127,
-
-    5, 10, 5, 0, // 9
-    0, 0, 5, 0,
-    5, 10, 0, 10,
-    0, 0, 0, 5,
-    5, 5, 0, 5, 127,
-
-    0, 10, 0, 10, 127, // .
-
-    0, 3, 0, 3, // :
-    0, 7, 0, 7, 127,
-
-    2, 8, 0, 10, 127, // ,
-
-    2, 2, 0, 0, 127, // '
-
-    0, 10, 0, 0, // é
-    0, 0, 5, 0,
-    5, 10, 0, 10,
-    5, 5, 0, 5,
-    1, -2, 4, -4, 127,
-
-    0, 10, 0, 0, // è
-    0, 0, 5, 0,
-    5, 10, 0, 10,
-    5, 5, 0, 5,
-    1, -4, 4, -2, 127,
-
-    0, 10, 0, 0, // ê
-    0, 0, 5, 0,
-    5, 10, 0, 10,
-    5, 5, 0, 5,
-    1, -2, 2, -4,
-    4, -2, 2, -4, 127,
-
-    0, 10, 0, 0, // à
-    0, 0, 5, 0,
-    5, 0, 5, 10,
-    5, 5, 0, 5,
-    1, -2, 4, 0, 127,
-
-    2, 0, 2, 3, // "
-    4, 0, 4, 3, 127,
-
-    1, 5, 4, 5, 127, // -
-
-    0, 10, 5, 0, 127, // /
-
-    5, 10, 0, 0, 127, // \
-
-    4, 0, 2, 3, // (
-    2, 3, 2, 7,
-    4, 10, 2, 7, 127,
-
-    1, 0, 3, 3, // )
-    3, 3, 3, 7,
-    1, 10, 3, 7, 127,
-
-    0, 5, 4, 5, // +
-    2, 3, 2, 7, 127
-};
 
 
 typedef struct Explosion {
@@ -427,15 +188,7 @@ typedef struct Curseur {
 #define CURSEUR_Y_INIT W_SEMI_HAUTEUR + 85
 #define CURSEUR_ESPACE 50
 
-#define MODELE_CURSEUR_LONGUEURE 5
-const Vector3 curseur_modele[MODELE_CURSEUR_LONGUEURE] =
-{
-    {-15, -15, 0},
-    {15, 0, 0 },
-    {-15, 15, 0},
-    {-12, 0, 0},
-    {-15, -15, 0}
-};
+
 
 typedef struct Ennemi {
 	Sprite self;
@@ -464,15 +217,6 @@ typedef struct Ennemi {
 #define ENNEMI_FRICTION 0.8f
 
 
-const TypeEnnemi* liste_niveaux[20] = {
-	0
-};
-
-const TypeEnnemi ennemis_valide_arcade[] = {
-        TYPEENNEMI_OCTAHEDRON, TYPEENNEMI_DIAMANT, TYPEENNEMI_TOURNANT, TYPEENNEMI_ENERGIE, TYPEENNEMI_CROISSANT, TYPEENNEMI_DUPLIQUEUR, TYPEENNEMI_PATRA,
-    TYPEENNEMI_OCTAHEDRON_DUR, TYPEENNEMI_DIAMANT_DUR, TYPEENNEMI_TOURNANT_DUR, TYPEENNEMI_ENERGIE_DUR, TYPEENNEMI_CROISSANT_DUR, TYPEENNEMI_DUPLIQUEUR_DUR, TYPEENNEMI_PATRA_DUR
-};
-
 typedef struct BombePulsar {
 	Jeu* jeu;
 	i32 HP;
@@ -483,29 +227,6 @@ typedef struct BombePulsar {
 #define QUANTITE_RAYONS_BOMBE_PULSAR 50
 #define BOMBE_PULSAR_MAX_HP 50
 #define COULEUR_BOMBE (SDL_Color){ .r = 150, .g = 255, .b = 255, .a = 255 }
-
-#define HYP_BOMBE_DATA_LEN 72
-const float hyperbole_bleue_bombe_pulsar_data[HYP_BOMBE_DATA_LEN] = {
-	-0.35f, -0.95f, -0.4f, -1.55f,
-	-0.4f, -1.55f, -0.6f, -2.15f,
-	-0.6f, -2.15f, -0.9f, -2.35f,
-	0.2f, -1.0f, 0.25f, -1.55f,
-	0.25f, -1.55f, 0.35f, -2.25f,
-	0.35f, -2.25f, 0.6f, -2.45f,
-	-0.15f, -1.15f, -0.15f, -1.8f,
-	0.0f, -1.75f, 0.2f, -2.25f,
-	-0.25f, -2.25f, -0.4f, -2.45f,
-	-0.3f, 0.95f, -0.45f, 1.5f,
-	-0.45f, 1.5f, -0.65f, 1.95f,
-	-0.65f, 1.95f, -1.0f, 2.2f,
-	0.25f, 0.95f, 0.3f, 1.5f,
-	0.3f, 1.5f, 0.5f, 2.0f,
-	0.5f, 2.0f, 1.0f, 2.3f,
-	0.0f, 1.2f, 0.05f, 1.8f,
-	-0.1f, 1.55f, -0.15f, 1.95f,
-	-0.4f, 1.75f, -0.25f, 1.3f
-};
-
 
 
 #define LARGEUR_MAX_VAGUE_ELECTRIQUE 80
@@ -540,9 +261,6 @@ typedef struct Item {
 	Sprite self;
 	TypeItem type;
 } Item;
-
-const float VITESSE_PROJECTILE = 0.95f;
-static SDL_bool son_cree;
 
 typedef struct Projectile {
 	Sprite self;
@@ -619,16 +337,6 @@ typedef struct Son {
 } Son;
 
 #define ALL_CHUNKS -1
-static SDL_Rect boite_volume =
-{
-    W_LARGEUR - 360,
-    10,
-    350,
-    100
-};
-
-const SDL_Rect BARRE_HP = { 125, 15, 10, 20 };
-const SDL_Rect BARRE_VAGUE = { 125, 40, 100, 20 };
 
 typedef struct Jeu {
 	SDL_Window* fenetre;
@@ -692,5 +400,110 @@ typedef enum Touches {
 	TOUCHE_MOINS = 2048
 } Touche;
 
-const i32 CODE_ARCADE[7] = { 0, TOUCHE_A, TOUCHE_R, TOUCHE_C, TOUCHE_A, TOUCHE_D, TOUCHE_E };
-const i32 TOUCHES_VALIDES_ARCADE = TOUCHE_A | TOUCHE_R | TOUCHE_C | TOUCHE_A | TOUCHE_D | TOUCHE_E;
+
+
+
+
+
+inline SDL_bool TouchePesee(Jeu* jeu, Touche touche) {
+
+	return (SDL_bool)(jeu->touches_pesees & touche);
+}
+
+inline SDL_bool GamemodeAction(Jeu* jeu) {
+
+	return (SDL_bool)(jeu->gamemode == GAMEMODE_AVENTURE || jeu->gamemode == GAMEMODE_ARCADE);
+}
+
+inline i32 NbEnnemis(Jeu* jeu) {
+
+	i32 resultat = 0;
+
+	for (int i = 0; i < NB_ENNEMIS; i++) {
+
+		if (jeu->ennemis[i].self.afficher)
+			resultat++;
+	}
+
+	return resultat;
+}
+
+inline void ClearEnnemis(Jeu* jeu) {
+
+	for (int i = 0; i < NB_ENNEMIS; i++) {
+
+		jeu->ennemis[i].self.afficher = SDL_FALSE;
+	}
+}
+
+inline void ClearProjectiles(Jeu* jeu) {
+
+	for (int i = 0; i < NB_PROJECTILES; i++) {
+
+		jeu->projectiles[i].self.afficher = SDL_FALSE;
+	}
+}
+
+inline void ClearExplosions(Jeu* jeu) {
+
+	for (int i = 0; i < NB_EXPLOSIONS; i++) {
+
+		jeu->explosions[i].timer = 0;
+	}
+}
+
+inline void ClearItems(Jeu* jeu) {
+
+	for (int i = 0; i < NB_ITEMS; i++) {
+
+		jeu->items[i].self.afficher = SDL_FALSE;
+	}
+}
+
+inline float DistanceV3(Vector3 a, Vector3 b) {
+
+	float dist_x = a.x - b.x;
+	float dist_y = a.y - b.y;
+	float dist_z = a.z - b.z;
+
+	return SDL_sqrtf(
+		dist_x * dist_x +
+		dist_y * dist_y +
+		dist_z + dist_z
+	);
+}
+
+inline float DistanceV2(Vector2 a, Vector2 b) {
+
+	float dist_x = a.x - b.x;
+	float dist_y = a.y - b.y;
+
+	return SDL_sqrtf(
+		dist_x * dist_x +
+		dist_y * dist_y
+	);
+}
+
+inline i32 RNG(i32 min, i32 max) {
+
+	return rand() % SDL_abs(max - min) + min;
+}
+
+inline void DessinerCercle(SDL_Renderer* render, Vector2 position, i32 rayon, i32 precision) {
+
+	float ang;
+	float next_ang;
+
+	for (int i = 0; i < precision; i++)
+	{
+		ang = (i * M_PI * 2.0f) / precision;
+		next_ang = ((i + 1) * M_PI * 2.0f) / precision;
+
+		SDL_RenderDrawLine(render,
+			position.x + rayon * SDL_sinf(ang),
+			position.y + rayon * SDL_cosf(ang),
+			position.x + rayon * SDL_sinf(next_ang),
+			position.y + rayon * SDL_cosf(next_ang)
+		);
+	}
+}

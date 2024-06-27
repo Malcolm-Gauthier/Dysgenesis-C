@@ -1,5 +1,8 @@
 #pragma once
 #include "Definitions.h"
+#include "Sprite.h"
+
+SDL_bool son_cree;
 
 Projectile* CreerProjectile(Jeu* jeu, Vector3 position, Vector3 destination, ProprietaireProjectile proprietaire, u8 ID);
 

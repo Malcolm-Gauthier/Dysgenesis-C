@@ -1,5 +1,12 @@
 #include "Dysgenesis.h"
 
+const i32 CODE_ARCADE[7] = { 0, TOUCHE_A, TOUCHE_R, TOUCHE_C, TOUCHE_A, TOUCHE_D, TOUCHE_E };
+const i32 TOUCHES_VALIDES_ARCADE = TOUCHE_A | TOUCHE_R | TOUCHE_C | TOUCHE_A | TOUCHE_D | TOUCHE_E;
+
+
+extern SDL_bool son_cree;
+extern const TypeEnnemi* liste_niveaux[20];
+
 int main() {
 
 	Jeu* jeu = SDL_malloc(sizeof(Jeu));
@@ -299,7 +306,7 @@ void Code(Jeu* jeu) {
 			case CURSEUR_CONTINUER:
 				Mix_HaltMusic();
 				jeu->niveau = jeu->niveau_continue - 1;
-				jeu->ennemis_tues = ARRAY_LEN(liste_niveaux[jeu->niveau]);
+				//jeu->ennemis_tues = ARRAY_LEN(liste_niveaux[jeu->niveau]);
 				jeu->ennemis_restant = 0;
 
 				InitializerJoueur(jeu->joueur);
@@ -528,6 +535,9 @@ void Render(Jeu* jeu) {
 
 		RenderVagueElectrique(jeu->vague_electrique);
 
+		const SDL_Rect BARRE_HP = { 125, 15, 10, 20 };
+		const SDL_Rect BARRE_VAGUE = { 125, 40, 100, 20 };
+
 		SDL_Rect barre_hud = BARRE_HP;
 		for (int i = 0; i < jeu->joueur->HP; i++)
 		{
@@ -551,9 +561,9 @@ void Render(Jeu* jeu) {
 			SDL_RenderFillRect(jeu->render, &barre_hud);
 			barre_hud.x += barre_hud.w + 5;
 		}
-
-		float vagues_reste = roundf(jeu->joueur->vagues_electriques, 1.0f);
-		barre_hud.w = (int)(roundf(vagues_reste, 2) * 100);
+		
+		float vagues_reste = SDL_fmodf(jeu->joueur->vagues_electriques, 1.0f);
+		barre_hud.w = (int)(SDL_fmodf(vagues_reste, 0.01f) * 100);
 		SDL_RenderFillRect(jeu->render, &barre_hud);
 
 		DisplayText(jeu, "    hp:\nvagues:", (Vector2) { 10, 15 }, 2, BLANC, OPAQUE, NO_SCROLL);
@@ -636,13 +646,13 @@ void Render(Jeu* jeu) {
 			}, 2, BLANC, OPAQUE, NO_SCROLL);
 		}
 
-		RenderSprite(jeu->curseur);
+		RenderSprite(&jeu->curseur->self);
 	}
 }
 
 void SDLRender(Jeu* jeu) {
 
-	RenderVolume(jeu->son);
+	RenderVolume(jeu);
 
 	SDL_SetRenderDrawColor(jeu->render, jeu->couleure_fond_ecran.r, jeu->couleure_fond_ecran.g, jeu->couleure_fond_ecran.b, jeu->couleure_fond_ecran.a);
 	SDL_RenderPresent(jeu->render);
@@ -665,114 +675,8 @@ void FreeMem(Jeu* jeu) {
 	SDL_DestroyRenderer(jeu->render);
 	SDL_DestroyWindow(jeu->fenetre);
 	Mix_FreeMusic(jeu->son->musique);
-	for (int i = 0; i < NB_CHAINES_SFX + 1; i++) Mix_FreeChunk(jeu->son->effets_sonnores[i]);
+	for (int i = 0; i < NB_CHAINES_SFX; i++) Mix_FreeChunk(jeu->son->effets_sonnores[i]);
 	Mix_CloseAudio();
 
 	SDL_free(jeu);
-}
-
-
-
-
-SDL_bool TouchePesee(Jeu* jeu, Touche touche) {
-
-	return (SDL_bool)(jeu->touches_pesees & touche);
-}
-
-SDL_bool GamemodeAction(Jeu* jeu) {
-
-	return (SDL_bool)(jeu->gamemode == GAMEMODE_AVENTURE || jeu->gamemode == GAMEMODE_ARCADE);
-}
-
-i32 NbEnnemis(Jeu* jeu) {
-
-	i32 resultat = 0;
-
-	for (int i = 0; i < NB_ENNEMIS; i++) {
-
-		if (jeu->ennemis[i].self.afficher)
-			resultat++;
-	}
-
-	return resultat;
-}
-
-void ClearEnnemis(Jeu* jeu) {
-
-	for (int i = 0; i < NB_ENNEMIS; i++) {
-
-		jeu->ennemis[i].self.afficher = SDL_FALSE;
-	}
-}
-
-void ClearProjectiles(Jeu* jeu) {
-
-	for (int i = 0; i < NB_PROJECTILES; i++) {
-
-		jeu->projectiles[i].self.afficher = SDL_FALSE;
-	}
-}
-
-void ClearExplosions(Jeu* jeu) {
-
-	for (int i = 0; i < NB_EXPLOSIONS; i++) {
-
-		jeu->explosions[i].timer = 0;
-	}
-}
-
-void ClearItems(Jeu* jeu) {
-
-	for (int i = 0; i < NB_ITEMS; i++) {
-
-		jeu->items[i].self.afficher = SDL_FALSE;
-	}
-}
-
-float DistanceV3(Vector3 a, Vector3 b) {
-
-	float dist_x = a.x - b.x;
-	float dist_y = a.y - b.y;
-	float dist_z = a.z - b.z;
-
-	return SDL_sqrtf(
-		dist_x * dist_x +
-		dist_y * dist_y +
-		dist_z + dist_z
-	);
-}
-
-float DistanceV2(Vector2 a, Vector2 b) {
-
-	float dist_x = a.x - b.x;
-	float dist_y = a.y - b.y;
-
-	return SDL_sqrtf(
-		dist_x * dist_x +
-		dist_y * dist_y
-	);
-}
-
-i32 RNG(i32 min, i32 max) {
-
-	return rand() % SDL_abs(max - min) + min;
-}
-
-void DessinerCercle(SDL_Renderer* render, Vector2 position, i32 rayon, i32 precision) {
-
-	float ang;
-	float next_ang;
-
-	for (int i = 0; i < precision; i++)
-	{
-		ang = (i * M_PI * 2) / precision;
-		next_ang = ((i + 1) * M_PI * 2) / precision;
-
-		SDL_RenderDrawLine(render,
-			position.x + rayon * SDL_sinf(ang),
-			position.y + rayon * SDL_cosf(ang),
-			position.x + rayon * SDL_sinf(next_ang),
-			position.y + rayon * SDL_cosf(next_ang)
-		);
-	}
 }

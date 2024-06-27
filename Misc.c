@@ -1,12 +1,34 @@
 #include "Misc.h"
 
+#define HYP_BOMBE_DATA_LEN 72
+const float hyperbole_bleue_bombe_pulsar_data[HYP_BOMBE_DATA_LEN] = {
+    -0.35f, -0.95f, -0.4f, -1.55f,
+    -0.4f, -1.55f, -0.6f, -2.15f,
+    -0.6f, -2.15f, -0.9f, -2.35f,
+    0.2f, -1.0f, 0.25f, -1.55f,
+    0.25f, -1.55f, 0.35f, -2.25f,
+    0.35f, -2.25f, 0.6f, -2.45f,
+    -0.15f, -1.15f, -0.15f, -1.8f,
+    0.0f, -1.75f, 0.2f, -2.25f,
+    -0.25f, -2.25f, -0.4f, -2.45f,
+    -0.3f, 0.95f, -0.45f, 1.5f,
+    -0.45f, 1.5f, -0.65f, 1.95f,
+    -0.65f, 1.95f, -1.0f, 2.2f,
+    0.25f, 0.95f, 0.3f, 1.5f,
+    0.3f, 1.5f, 0.5f, 2.0f,
+    0.5f, 2.0f, 1.0f, 2.3f,
+    0.0f, 1.2f, 0.05f, 1.8f,
+    -0.1f, 1.55f, -0.15f, 1.95f,
+    -0.4f, 1.75f, -0.25f, 1.3f
+};
+
 void DessinerBombePulsar(SDL_Renderer* render, Vector2 position, u8 rayon, SDL_Color couleure, SDL_bool hyperbole_bleue) {
 
     if (hyperbole_bleue) {
 
         SDL_SetRenderDrawColor(render, 0, 0, 255, 255);
 
-        for (int i = 0; i < HYP_BOMBE_DATA_LEN; i += 4)
+        for (int i = 0; i < HYP_BOMBE_DATA_LEN - 3; i += 4)
         {
             SDL_RenderDrawLine(render,
                 (int)(hyperbole_bleue_bombe_pulsar_data[i + 0] * rayon + position.x),
@@ -90,7 +112,9 @@ int CollisionBombeProjectile(BombePulsar* bombe, Jeu* jeu) {
         }
 
         float positions[4];
-        PositionsSurEcran(&jeu->projectiles[i], positions);
+        if (PositionsSurEcran(&jeu->projectiles[i], positions)) {
+            return 0;
+        }
 
         if (DistanceV2((Vector2) { .x = positions[2], .y = positions[3] }, (Vector2) { .x = W_SEMI_LARGEUR, .y = W_SEMI_HAUTEUR / 2}) < 20) {
 
@@ -218,6 +242,382 @@ void Scene4(Jeu* jeu, i32 gTimer) {
 }
 
 
+const i16 char_draw_info_starting_indexes[] = {
+    1, 18, 47, 60, 81, 98, 111, 132, 145, 158, 171, 184, 193, 210, 223, 240, // a - p
+    257, 278, 299, 320, 329, 342, 351, 368, 377, 386, 399, 420, 433, 454, 471, // q - 4
+    484, 513, 534, 543, 564, 585, 590, 599, 604, 609, 630, 651, 676, 697, 706, // 5 - ??
+    711, 716, 721, 734, 747
+};
+#define CHAR_DRAW_INFO_LEN 756
+const i8 char_draw_info[CHAR_DRAW_INFO_LEN] = {
+    127, // space/unknown
+
+    0, 10, 0, 0, // a
+    0, 0, 5, 0,
+    5, 0, 5, 10,
+    5, 5, 0, 5, 127,
+
+    0, 10, 0, 0, // b
+    0, 0, 5, 0,
+    5, 0, 5, 3,
+    5, 3, 0, 5,
+    0, 5, 5, 7,
+    5, 7, 5, 10,
+    5, 10, 0, 10, 127,
+
+    0, 10, 0, 0, // c
+    0, 0, 5, 0,
+    5, 10, 0, 10, 127,
+
+    0, 10, 0, 0, // d
+    0, 0, 2, 0,
+    2, 10, 0, 10,
+    2, 10, 5, 5,
+    2, 0, 5, 5, 127,
+
+    0, 10, 0, 0, // e
+    0, 0, 5, 0,
+    5, 10, 0, 10,
+    5, 5, 0, 5, 127,
+
+    0, 10, 0, 0, // f
+    0, 0, 5, 0,
+    5, 5, 0, 5, 127,
+
+    0, 10, 0, 0, // g
+    0, 0, 5, 0,
+    5, 10, 0, 10,
+    5, 10, 5, 5,
+    5, 5, 3, 5, 127,
+
+    0, 10, 0, 0, // h
+    5, 0, 5, 10,
+    5, 5, 0, 5, 127,
+
+    0, 0, 5, 0, // i
+    2, 0, 2, 10,
+    5, 10, 0, 10, 127,
+
+    5, 0, 5, 10, // j
+    5, 10, 0, 10,
+    0, 10, 0, 7, 127,
+
+    0, 10, 0, 0, // k
+    0, 5, 5, 0,
+    0, 5, 5, 10, 127,
+
+    0, 10, 0, 0, // l
+    5, 10, 0, 10, 127,
+
+    0, 10, 0, 0, // m
+    5, 0, 5, 10,
+    0, 0, 2, 5,
+    5, 0, 2, 5, 127,
+
+    0, 10, 0, 0, // n
+    5, 0, 5, 10,
+    0, 0, 5, 10, 127,
+
+    0, 10, 0, 0, // o
+    5, 0, 5, 10,
+    0, 0, 5, 0,
+    5, 10, 0, 10, 127,
+
+    0, 10, 0, 0, // p
+    0, 0, 5, 0,
+    5, 0, 5, 5,
+    5, 5, 0, 5, 127,
+
+    0, 10, 0, 0, // q
+    4, 0, 4, 10,
+    0, 0, 4, 0,
+    4, 10, 0, 10,
+    5, 10, 3, 5, 127,
+
+    0, 10, 0, 0, // r
+    0, 0, 5, 0,
+    5, 0, 5, 5,
+    5, 5, 0, 5,
+    2, 5, 5, 10, 127,
+
+    0, 0, 5, 0, // s
+    5, 10, 0, 10,
+    5, 5, 0, 5,
+    0, 0, 0, 5,
+    5, 10, 5, 5, 127,
+
+    2, 0, 2, 10, // t
+    0, 0, 5, 0, 127,
+
+    0, 10, 0, 0, // u
+    5, 0, 5, 10,
+    5, 10, 0, 10, 127,
+
+    0, 0, 2, 10, // v
+    5, 0, 2, 10, 127,
+
+    0, 10, 0, 0, // w
+    5, 0, 5, 10,
+    5, 10, 0, 10,
+    2, 10, 2, 4, 127,
+
+    0, 0, 5, 10, // x
+    5, 0, 0, 10, 127,
+
+    5, 0, 0, 10, // y
+    0, 0, 2, 5, 127,
+
+    0, 0, 5, 0, // z
+    5, 10, 0, 10,
+    5, 0, 0, 10, 127,
+
+    5, 0, 0, 10, // 0
+    0, 10, 0, 0,
+    5, 0, 5, 10,
+    0, 0, 5, 0,
+    5, 10, 0, 10, 127,
+
+    0, 3, 2, 0, // 1
+    2, 0, 2, 10,
+    5, 10, 0, 10, 127,
+
+    0, 3, 1, 0, // 2
+    1, 0, 4, 0,
+    5, 3, 4, 0,
+    5, 3, 0, 10,
+    5, 10, 0, 10, 127,
+
+    5, 10, 5, 0, // 3
+    0, 0, 5, 0,
+    5, 10, 0, 10,
+    5, 5, 0, 5, 127,
+
+    0, 5, 0, 0, // 4
+    5, 0, 5, 10,
+    5, 5, 0, 5, 127,
+
+    5, 0, 0, 0, // 5
+    0, 5, 0, 0,
+    5, 5, 0, 5,
+    5, 5, 5, 8,
+    5, 8, 4, 10,
+    4, 10, 1, 10,
+    1, 10, 0, 8, 127,
+
+    0, 10, 0, 0, // 6
+    0, 0, 5, 0,
+    5, 10, 0, 10,
+    5, 10, 5, 5,
+    5, 5, 0, 5, 127,
+
+    5, 0, 0, 0, // 7
+    5, 0, 0, 10, 127,
+
+    5, 5, 0, 5, // 8
+    0, 10, 0, 0,
+    5, 0, 5, 10,
+    0, 0, 5, 0,
+    5, 10, 0, 10, 127,
+
+    5, 10, 5, 0, // 9
+    0, 0, 5, 0,
+    5, 10, 0, 10,
+    0, 0, 0, 5,
+    5, 5, 0, 5, 127,
+
+    0, 10, 0, 10, 127, // .
+
+    0, 3, 0, 3, // :
+    0, 7, 0, 7, 127,
+
+    2, 8, 0, 10, 127, // ,
+
+    2, 2, 0, 0, 127, // '
+
+    0, 10, 0, 0, // é
+    0, 0, 5, 0,
+    5, 10, 0, 10,
+    5, 5, 0, 5,
+    1, -2, 4, -4, 127,
+
+    0, 10, 0, 0, // è
+    0, 0, 5, 0,
+    5, 10, 0, 10,
+    5, 5, 0, 5,
+    1, -4, 4, -2, 127,
+
+    0, 10, 0, 0, // ê
+    0, 0, 5, 0,
+    5, 10, 0, 10,
+    5, 5, 0, 5,
+    1, -2, 2, -4,
+    4, -2, 2, -4, 127,
+
+    0, 10, 0, 0, // à
+    0, 0, 5, 0,
+    5, 0, 5, 10,
+    5, 5, 0, 5,
+    1, -2, 4, 0, 127,
+
+    2, 0, 2, 3, // "
+    4, 0, 4, 3, 127,
+
+    1, 5, 4, 5, 127, // -
+
+    0, 10, 5, 0, 127, // /
+
+    5, 10, 0, 0, 127, // \
+
+    4, 0, 2, 3, // (
+    2, 3, 2, 7,
+    4, 10, 2, 7, 127,
+
+    1, 0, 3, 3, // )
+    3, 3, 3, 7,
+    1, 10, 3, 7, 127,
+
+    0, 5, 4, 5, // +
+    2, 3, 2, 7, 127
+};
+
+static int GetListEntry(char c)
+{
+    if (c >= 'a' && c <= 'z')
+        return char_draw_info_starting_indexes[c - 'a'];
+    else if (c >= '0' && c <= '9')
+        return char_draw_info_starting_indexes[c - '0' + 26];
+    else
+    {
+        switch (c)
+        {
+        case '.':
+            return char_draw_info_starting_indexes[36];
+        case ':':
+            return char_draw_info_starting_indexes[37];
+        case ',':
+            return char_draw_info_starting_indexes[38];
+        case '\'':
+            return char_draw_info_starting_indexes[39];
+        case 'é':
+            return char_draw_info_starting_indexes[40];
+        case 'è':
+            return char_draw_info_starting_indexes[41];
+        case 'ê':
+            return char_draw_info_starting_indexes[42];
+        case 'à':
+            return char_draw_info_starting_indexes[43];
+        case '"':
+            return char_draw_info_starting_indexes[44];
+        case '-':
+            return char_draw_info_starting_indexes[45];
+        case '/':
+            return char_draw_info_starting_indexes[46];
+        case '\\':
+            return char_draw_info_starting_indexes[47];
+        case '(':
+            return char_draw_info_starting_indexes[48];
+        case ')':
+            return char_draw_info_starting_indexes[49];
+        case '+':
+            return char_draw_info_starting_indexes[50];
+        }
+    }
+
+    return 0;
+}
+
+void DisplayText(Jeu* jeu, char* text, Vector2 position, float size, int color, int alpha, int scroll)
+{
+    if (scroll <= 0)
+        return;
+
+    if (alpha <= 0)
+        return;
+
+    i32 strlen = SDL_strlen(text);
+
+    char* working_text = (char*)SDL_malloc(strlen + 1);
+    SDL_memcpy(working_text, text, strlen + 1);
+    for (int i = 0; working_text[i]; i++) {
+        working_text[i] = SDL_tolower(working_text[i]);
+    }
+
+    i16 extra_y = 0;
+    i32 return_length = 0;
+
+    if (scroll < 0)
+        scroll = 0;
+    else if (scroll > strlen)
+        scroll = strlen;
+
+    if (alpha < 0)
+        alpha = 0;
+    else if (alpha > SDL_MAX_UINT8)
+        alpha = SDL_MAX_UINT8;
+
+    if (position.x == CENTRE)
+        position.x = W_SEMI_LARGEUR - ((LARGEUR_DEFAUT + ESPACE_DEFAUT) * size * strlen - 1) / 2;
+
+    if (position.y == CENTRE)
+        position.y = W_SEMI_HAUTEUR - (HAUTEUR_DEFAUT * size) / 2;
+
+    SDL_SetRenderDrawColor(jeu->render, (u8)((color >> 16) & 0xFF), (u8)((color >> 8) & 0xFF), (u8)(color & 0xFF), (u8)alpha);
+
+    float x;
+    float y;
+    int current_info_index;
+    for (int i = 0; i < scroll; i++)
+    {
+        y = position.y + extra_y;
+        x = position.x + i * (LARGEUR_DEFAUT + ESPACE_DEFAUT) * size - return_length;
+
+        if (x + size * LARGEUR_DEFAUT * 4 > W_LARGEUR)
+        {
+            extra_y += (i16)((HAUTEUR_DEFAUT + ESPACE_DEFAUT) * size);
+            return_length = (i32)((i + 1) * 8 * size);
+        }
+
+        if (working_text[i] == '\0')
+            break;
+
+        if (working_text[i] == '\n')
+        {
+            extra_y += (i16)((HAUTEUR_DEFAUT + ESPACE_DEFAUT) * size);
+            return_length = (i32)((i + 1) * (LARGEUR_DEFAUT + ESPACE_DEFAUT) * size);
+            continue;
+        }
+
+        current_info_index = GetListEntry(working_text[i]);
+
+        while (current_info_index < CHAR_DRAW_INFO_LEN - 3)
+        {
+            if (char_draw_info[current_info_index] == 127)
+                break;
+
+            SDL_RenderDrawLine(jeu->render,
+                char_draw_info[current_info_index] * size + x,
+                char_draw_info[current_info_index + 1] * size + y,
+                char_draw_info[current_info_index + 2] * size + x,
+                char_draw_info[current_info_index + 3] * size + y
+            );
+
+            current_info_index += 4;
+        }
+    }
+
+    SDL_free(working_text);
+}
+
+
+#define MODELE_CURSEUR_LONGUEURE 5
+const Vector3 curseur_modele[MODELE_CURSEUR_LONGUEURE] = {
+    {-15, -15, 0},
+    {15, 0, 0 },
+    {-15, 15, 0},
+    {-12, 0, 0},
+    {-15, -15, 0}
+};
+
 Curseur* CreerCurseur(Jeu* jeu) {
 
     if (jeu->curseur != NULL) {
@@ -228,7 +628,7 @@ Curseur* CreerCurseur(Jeu* jeu) {
     Curseur* curseur = SDL_malloc(sizeof(Curseur));
 
     InitSprite(&curseur->self, jeu);
-    curseur->self.modele = curseur_modele;
+    curseur->self.modele = &curseur_modele;
     curseur->self.modele_longueur = MODELE_CURSEUR_LONGUEURE;
     curseur->max_selection = 1;
     curseur->option_selectionee = CURSEUR_NOUVELLE_PARTIE;
@@ -281,7 +681,7 @@ Explosion* CreerExplosion(Jeu* jeu, Vector3 position) {
 
         if (!jeu->explosions[i].timer > 0) {
 
-            explosion = &jeu->projectiles[i];
+            explosion = &jeu->explosions[i];
             break;
         }
     }
@@ -342,6 +742,13 @@ void RenderExplosion(Explosion* explosion) {
     }
 }
 
+
+static SDL_Rect boite_volume = {
+    W_LARGEUR - 360,
+    10,
+    350,
+    100
+};
 
 int InitSDLMixer(Son* son) {
 
@@ -478,6 +885,6 @@ void RenderVolume(Jeu* jeu) {
     char* vol = "      ";
     char txt[20] = "volume: ";
     SDL_itoa(jeu->son->volume, vol, 10);
-    SDL_strlcat(txt, vol, 50);
+    SDL_strlcat(txt, vol, 20);
     DisplayText(jeu, txt, (Vector2) { .x = boite_volume.x + 40, boite_volume.y + 30 }, 3, BLANC, OPAQUE, NO_SCROLL);
 }
