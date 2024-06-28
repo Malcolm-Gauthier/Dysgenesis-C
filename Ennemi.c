@@ -1,5 +1,249 @@
 #include "Ennemi.h"
 
+extern int PositionsSurEcran(Projectile* projectile, float* output);
+extern Projectile* CreerProjectile(Jeu* jeu, Vector3 position, Vector3 destination, ProprietaireProjectile proprietaire, u8 ID);
+extern int PositionLigneModele(Sprite* sprite, i32 index_ligne, float* output);
+extern SDL_bool JoueurMort(Joueur* joueur);
+extern int InitSprite(Sprite* sprite, Jeu* jeu);
+
+static Vector3 MODELE_E1[] = {
+	{0, 0, -20},
+	{-16, 0, 10},
+	{16, 0, 10},
+	{0, 0, -20},
+	{0, -30, 0},
+	{-16, 0, 10},
+	{0, -30, 0},
+	{16, 0, 10},
+	{0, 30, 0},
+	{0, 0, -20},
+	{-16, 0, 10},
+	{0, 30, 0},
+	{-5, 5, 0},
+	{0, 2, 0},
+	{5, 5, 0},
+	{0, 8, 0},
+	{-5, 5, 0},
+	{0, 5, 0},
+	{0, 5, 0}
+};
+static i32 MODELE_E1_SAUTS[] = { 12, 17, -1 };
+static Vector3 MODELE_E2[] = {
+	{-30, 0, 0},
+	{-15, 0, 26},
+	{0, 50, 0},
+	{-30, 0, 0},
+	{-15, 0, -26},
+	{0, 50, 0},
+	{15, 0, -26},
+	{-15, 0, -26},
+	{15, 0, -26},
+	{30, 0, 0},
+	{0, 50, 0},
+	{15, 0, 26},
+	{30, 0, 0},
+	{15, 0, 26},
+	{-15, 0, 26},
+	{-12, -10, 21},
+	{-25, -10, 0},
+	{-30, 0, 0},
+	{-25, -10, 0},
+	{-12, -10, -21},
+	{-15, 0, -26},
+	{-12, -10, -21},
+	{12, -10, -21},
+	{15, 0, -26},
+	{12, -10, -21},
+	{25, -10, 0},
+	{30, 0, 0},
+	{25, -10, 0},
+	{12, -10, 21},
+	{15, 0, 26},
+	{12, -10, 21},
+	{-12, -10, 21},
+	{-12, -10, 3},
+	{-12, -10, -3},
+	{-17, -10, 0},
+	{-20, -18, 0},
+	{-15, -18, 3},
+	{-12, -10, 3},
+	{-15, -18, 3},
+	{-15, -18, -3},
+	{-12, -10, -3},
+	{-15, -18, -3},
+	{-20, -18, 0},
+	{-5, -23, 0},
+	{-15, -18, -3},
+	{-5, -23, 0},
+	{-15, -18, 3},
+	{-12, -10, 3},
+	{-12, -10, 21},
+	{12, -10, 21},
+	{12, -10, 3},
+	{12, -10, -3},
+	{17, -10, 0},
+	{20, -18, 0},
+	{15, -18, 3},
+	{12, -10, 3},
+	{15, -18, 3},
+	{15, -18, -3},
+	{12, -10, -3},
+	{15, -18, -3},
+	{20, -18, 0},
+	{5, -23, 0},
+	{15, -18, -3},
+	{5, -23, 0},
+	{15, -18, 3},
+	{12, -10, 3},
+	{12, -10, 21}
+};
+static i32 MODELE_E2_SAUTS[] = { 48, 50, -1 };
+static Vector3 MODELE_E3[] = {
+	{-50, 0, 0},
+	{-50, -10, 40},
+	{-45, 0, 0},
+	{-50, 0, 0},
+	{-20, -10, -10},
+	{-20, 10, -10},
+	{20, 10, -10},
+	{20, 10, 10},
+	{50, 0, 0},
+	{50, -10, 40},
+	{45, 0, 0},
+	{50, 0, 0},
+	{20, 10, -10},
+	{20, -10, -10},
+	{-20, -10, -10},
+	{-20, -10, 10},
+	{20, -10, 10},
+	{20, -10, -10},
+	{50, 0, 0},
+	{20, -10, 10},
+	{20, 10, 10},
+	{-20, 10, 10},
+	{-50, 0, 0},
+	{-20, -10, 10},
+	{-20, 10, 10},
+	{-20, 10, -10},
+	{-50, 0, 0}
+};
+static i32 MODELE_E3_SAUTS[] = { -1 };
+static Vector3 MODELE_E5[] = {
+	{-15, 45, 10},
+	{-10, 30, 10},
+	{-25, 30, 50},
+	{-15, 45, 10},
+	{-40, 30, 10},
+	{-25, 30, 50},
+	{-25, 20, 10},
+	{-10, 30, 10},
+	{-25, 20, 10},
+	{-40, 30, 10},
+	{-50, 0, 10},
+	{-40, -30, 10},
+	{-15, -50, 10},
+	{15, -50, 10},
+	{40, -30, 10},
+	{50, 0, 10},
+	{40, 25, 10},
+	{15, 45, 10},
+	{25, 30, 50},
+	{40, 25, 10},
+	{25, 20, 10},
+	{25, 30, 50},
+	{10, 30, 10},
+	{15, 45, 10},
+	{10, 30, 10},
+	{25, 20, 10},
+	{35, 0, 10},
+	{25, -20, 10},
+	{10, -30, 10},
+	{0, -10, 0},
+	{-10, -30, 10},
+	{-25, -20, 10},
+	{-35, 0, 10},
+	{-25, 20, 10},
+	{-25, 20, -10},
+	{-10, 30, -10},
+	{-10, 30, 10},
+	{-10, 30, -10},
+	{-15, 45, -10},
+	{-15, 45, 10},
+	{-15, 45, -10},
+	{-40, 30, -10},
+	{-40, 30, 10},
+	{-40, 30, -10},
+	{-25, 20, -10},
+	{-35, 0, -10},
+	{-25, -20, -10},
+	{-10, -30, -10},
+	{0, -10, 0},
+	{-15, 10, -15},
+	{15, 10, -15},
+	{0, -10, 0},
+	{15, 10, 15},
+	{15, 10, -15},
+	{15, 10, 15},
+	{-15, 10, 15},
+	{-15, 10, -15},
+	{-15, 10, 15},
+	{0, -10, 0},
+	{10, -30, -10},
+	{25, -20, -10},
+	{35, 0, -10},
+	{25, 20, -10},
+	{40, 30, -10},
+	{25, 20, -10},
+	{25, 20, 10},
+	{25, 20, -10},
+	{10, 30, -10},
+	{10, 30, 10},
+	{10, 30, -10},
+	{15, 45, -10},
+	{15, 45, 10},
+	{15, 45, -10},
+	{40, 30, -10},
+	{40, 30, 10},
+	{40, 30, -10},
+	{50, 0, -10},
+	{40, -30, -10},
+	{15, -50, -10},
+	{-15, -50, -10},
+	{-40, -30, -10},
+	{-50, 0, -10},
+	{-40, 30, -10}
+};
+static i32 MODELE_E5_SAUTS[] = { -1 };
+static Vector3 MODELE_E6[] = {
+	{-25, 0, 0},
+	{0, -10, 0},
+	{25, 0, 0},
+	{0, -10, -30},
+	{0, -10, 0},
+	{0, -10, -30},
+	{-25, 0, 0}
+};
+static i32 MODELE_E6_SAUTS[] = { -1 };
+static Vector3 MODELE_E7[] = {
+	{0, 20, 0},
+	{40, 0, 0},
+	{0, -20, 0},
+	{-40, 0, 0},
+	{0, 20, 0},
+	{10, 0, 0},
+	{0, -20, 0},
+	{-10, 0, 0},
+	{0, 20, 0}
+};
+static i32 MODELE_E7_SAUTS[] = { -1 };
+static Vector3 MODELE_E7_1[] = {
+	{0, 10, 0},
+	{-8, -6, 0},
+	{8, -6, 0},
+	{0, 10, 0}
+};
+static i32 MODELE_E7_1_SAUTS[] = { -1 };
+
 typedef struct EnnemiData {
 	TypeEnnemi ID;
 
@@ -18,8 +262,19 @@ typedef struct EnnemiData {
 } EnnemiData;
 
 #define DATAENNEMI_CAPACITE 17
-EnnemiData DataEnnemi[DATAENNEMI_CAPACITE] = {
-	0
+const EnnemiData DataEnnemi[DATAENNEMI_CAPACITE] = {
+	{
+		.ID = TYPEENNEMI_OCTAHEDRON,
+		.vitesse = VITESSE_MOYENNE_ENNEMI / 8,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI,
+		.vitesse_tir = 0,
+		.hp_max = 1,
+		.largeur = 30,
+		.couleure = {.r = 255,.g = 255,.b = 0,.a = 255},
+		.indexs_tir = {18, -1},
+		.modele = MODELE_E1,
+		.modele_sauts = MODELE_E1_SAUTS
+	},
 };
 
 Ennemi* CreerEnnemi(Jeu* jeu, TypeEnnemi type, StatusEnnemi statut, Ennemi* parent) {
@@ -74,10 +329,15 @@ Ennemi* CreerEnnemi(Jeu* jeu, TypeEnnemi type, StatusEnnemi statut, Ennemi* pare
 	ennemi->self.modele_longueur = DataEnnemi[i].modele_longueur;
 	ennemi->self.indexs_lignes_sauter = DataEnnemi[i].modele_sauts;
 
-	ennemi->modele_en_marche = NULL;
+	if (ennemi->modele_en_marche) {
+
+		SDL_free(ennemi->modele_en_marche);
+		ennemi->modele_en_marche = NULL;
+	}
+
 	if (ennemi->self.modele != NULL) {
 
-		ennemi->modele_en_marche = malloc(sizeof(Vector3) * ennemi->self.modele_longueur);
+		ennemi->modele_en_marche = SDL_malloc(sizeof(Vector3) * ennemi->self.modele_longueur);
 		if (ennemi->modele_en_marche == NULL) return NULL;
 		SDL_memcpy(ennemi->modele_en_marche, ennemi->self.modele, sizeof(Vector3) * ennemi->self.modele_longueur);
 	}
@@ -344,7 +604,7 @@ void ActualiserModeleEnnemi(Ennemi* ennemi) {
 
 SDL_bool CodeBoss(Ennemi* ennemi) {
 
-	if (ennemi->type == TYPEENNEMI_BOSS || ennemi->statut == STATUSENNEMI_BOSS_NORMAL) {
+	if (ennemi->statut != STATUSENNEMI_BOSS_NORMAL) {
 
 		return SDL_FALSE;
 	}
@@ -663,11 +923,15 @@ Vector2 TrouverCibleEnnemi(Ennemi* ennemi) {
 		return ennemi->cible;
 	}
 
-	Vector2 nouveau;
+	Vector2 nouveau = { 0 };
 	Vector3* joueur_pos = &ennemi->self.jeu->joueur->self.position;
 	float dist_joueur_ennemi = DistanceV2(
-		(Vector2) { .x = ennemi->self.position.x, .y = ennemi->self.position.y },
-		(Vector2) { .x = joueur_pos->x, .y = joueur_pos->y }
+		(Vector2) {
+		.x = ennemi->self.position.x, .y = ennemi->self.position.y
+	},
+		(Vector2) {
+		.x = joueur_pos->x, .y = joueur_pos->y
+	}
 	);
 
 	if (dist_joueur_ennemi < 200) {
@@ -679,8 +943,7 @@ Vector2 TrouverCibleEnnemi(Ennemi* ennemi) {
 
 			if (++anti_boucle_infini > LIMITE_BOUCLE)
 				break;
-		}
-		while (DistanceV2(nouveau, (Vector2) { .x = joueur_pos->x, .y = joueur_pos->y }) < 800);
+		} while (DistanceV2(nouveau, (Vector2) { .x = joueur_pos->x, .y = joueur_pos->y }) < 800);
 
 		return nouveau;
 	}
@@ -701,8 +964,7 @@ Vector2 TrouverCibleEnnemi(Ennemi* ennemi) {
 
 		if (++anti_boucle_infini > LIMITE_BOUCLE)
 			break;
-	}
-	while (DistanceV2(nouveau, (Vector2) { .x = joueur_pos->x, .y = joueur_pos->y }) > 800);
+	} while (DistanceV2(nouveau, (Vector2) { .x = joueur_pos->x, .y = joueur_pos->y }) > 800);
 
 	return nouveau;
 }
@@ -795,7 +1057,9 @@ void TirEnnemi(Ennemi* ennemi) {
 
 		CreerProjectile(
 			ennemi->self.jeu,
-			(Vector3) { .x = data_ligne[0], .y = data_ligne[1], .z = ennemi->self.position.z },
+			(Vector3) {
+			.x = data_ligne[0], .y = data_ligne[1], .z = ennemi->self.position.z
+		},
 			cible,
 			PROPRIETAIREPROJ_ENNEMI,
 			i
@@ -809,7 +1073,9 @@ void RenderEnnemi(Ennemi* ennemi) {
 
 		DessinerBombePulsar(
 			ennemi->self.jeu->render,
-			(Vector2) { ennemi->self.position.x, ennemi->self.position.y },
+			(Vector2) {
+			ennemi->self.position.x, ennemi->self.position.y
+		},
 			(u8)(40 * SDL_powf(0.95f, ennemi->self.position.z)),
 			ennemi->self.couleure,
 			SDL_FALSE

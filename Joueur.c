@@ -1,6 +1,68 @@
 #include "Joueur.h"
 #include "Misc.h"
 
+#define MODELE_JOUEUR_LONGUEUR 57
+const Vector3 MODELE_P[] = {
+	{-50,0,0}, // rouge
+	{-46,-2,-50}, // orange
+	{-46,0,-2}, // vomi
+	{-46,-4,-2}, // -vomi
+	{-46,0,-2}, // vomi
+	{-10,5,-5}, // vert pâle
+	{-10,-5,-5}, // -vert pâle
+	{-10,5,-5}, // vert pâle
+	{-5,5,-15}, // rose
+	{-5,0,-15}, // -rose
+	{-5,5,-15}, // rose
+	{5,5,-15}, // rose
+	{5,0,-15}, // -rose
+	{5,5,-15}, // rose
+	{10,5,-5}, // vert pâle
+	{46,0,-2}, // vomi
+	{46,-2,-50}, // orange
+	{50,0,0}, // rouge
+	{50,-5,0}, // rouge 2
+	{13,-10,10}, // bleu
+	{15,-9,20}, // mauve
+	{4,10,10}, // vert foncé
+	{13,-10,10}, // bleu
+	{15,-9,20}, // mauve
+	{0,-15,20}, // bleh
+	{-15,-9,20}, // mauve
+	{-4,10,10}, // vert foncé
+	{-13,-10,10}, // bleu
+	{-15,-9,20}, // mauve
+	{-13,-10,10}, // bleu
+	{-50,-5,0}, // rouge 2
+	{-50,0,0}, // rouge
+	{-50,-5,0}, // rouge 2
+	{-46,-2,-50}, // orange
+	{-46,-4,-2}, // -vomi
+	{-10,-5,-5}, // -vert pâle
+	{-5,0,-15}, // -rose
+	{5,0,-15}, // -rose
+	{10,-5,-5}, // -vert pâle
+	{46,-4,-2}, // -vomi
+	{46,-2,-50}, // orange
+	{50,-5,0}, // rouge 2
+	{50,0,0}, // rouge
+	{10,5,10}, // -bleu
+	{4,10,10}, // vert foncé
+	{2,10,10}, // l'autre
+	{1,15,10}, // bleu pâle
+	{-1,15,10}, // bleu pâle
+	{1,15,10}, // bleu pâle
+	{0,15,25}, // jaune
+	{0,-15,20}, // bleh
+	{0,15,25}, // jaune
+	{-1,15,10}, // bleu pâle
+	{-2,10,10}, // l'autre
+	{-4,10,10}, // vert foncé
+	{-10,5,10}, // -bleu
+	{-50,0,0} // rouge
+};
+extern const i32 SAUTS_MODELE_AUCUN;
+
 int CreerJoueur(Jeu* jeu, Joueur* joueur) {
 
 	joueur->self.jeu = jeu;
@@ -8,10 +70,10 @@ int CreerJoueur(Jeu* jeu, Joueur* joueur) {
 	joueur->self.indexs_de_tir[0] = 1;
 	joueur->self.indexs_de_tir[1] = 16;
 
-	joueur->self.modele = NULL;
-	joueur->self.modele_longueur = 0;
+	joueur->self.modele = MODELE_P;
+	joueur->self.modele_longueur = MODELE_JOUEUR_LONGUEUR;
 
-	joueur->self.indexs_lignes_sauter = NULL;
+	joueur->self.indexs_lignes_sauter = &SAUTS_MODELE_AUCUN;
 
 	InitializerJoueur(joueur);
 
@@ -23,7 +85,8 @@ void InitializerJoueur(Joueur* joueur) {
 	joueur->HP = JOUEUR_DEFAULT_HP;
 	joueur->powerup = TYPEITEM_NONE;
 	joueur->velocite = (Vector2){ .x = 0, .y = -30 };
-	joueur->self.position = (Vector3){ .x = W_SEMI_LARGEUR, .y = W_SEMI_HAUTEUR, 0 };
+	joueur->vitesse_tir = JOUEUR_VITESSE_TIR;
+	joueur->self.position = (Vector3){ .x = W_SEMI_LARGEUR, .y = W_HAUTEUR, 0 };
 	joueur->self.afficher = SDL_TRUE;
 	joueur->self.pitch = 0;
 	joueur->self.roll = 0;
@@ -56,21 +119,21 @@ SDL_bool ExistJoueur(Joueur* joueur) {
 static int TirJoueur(Joueur* joueur) {
 
 	const Vector2 DECALS_PROJ[] = {
-		(Vector2) { 10, -200 },
-		(Vector2) { -10, -200 },
-		(Vector2) { 30, -240 },
-		(Vector2) { -30, -240 },
-		(Vector2) { 50, -200 },
-		(Vector2) { -50, -200 },
+		(Vector2) { .x=10, .y=-200 },
+		(Vector2) { .x=-10, .y=-200 },
+		(Vector2) { .x=30, .y=-240 },
+		(Vector2) { .x=-30, .y=-240 },
+		(Vector2) { .x=50, .y=-200 },
+		(Vector2) { .x=-50, .y=-200 },
 	};
-
+	
 	joueur->self.timer++;
 
 	if (joueur->self.timer < joueur->vitesse_tir) {
 		return 0;
 	}
 
-	if (TouchePesee(joueur->self.jeu, TOUCHE_J)) {
+	if (!TouchePesee(joueur->self.jeu, TOUCHE_J)) {
 		return 0;
 	}
 

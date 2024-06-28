@@ -16,14 +16,14 @@ typedef int32_t i32;
 typedef uint32_t u32;
 
 typedef struct Vector2 {
-    float x;
-    float y;
+	float x;
+	float y;
 } Vector2;
 
 typedef struct Vector3 {
-    float x;
-    float y;
-    float z;
+	float x;
+	float y;
+	float z;
 } Vector3;
 
 #define G_FPS 60
@@ -161,26 +161,26 @@ typedef enum StatusEnnemi {
 
 
 typedef struct Explosion {
-    Jeu* jeu;
-    Vector3 position;
-    i32 timer;
+	Jeu* jeu;
+	Vector3 position;
+	i32 timer;
 } Explosion;
 
 
 #define NB_OPTIONS 4
 typedef enum OptionsCurseur {
-    CURSEUR_NOUVELLE_PARTIE,
-    CURSEUR_CONTINUER,
-    CURSEUR_ARCADE,
-    CURSEUR_AUCUN
+	CURSEUR_NOUVELLE_PARTIE,
+	CURSEUR_CONTINUER,
+	CURSEUR_ARCADE,
+	CURSEUR_AUCUN
 } OptionsCurseur;
 
 typedef struct Curseur {
-    Sprite self;
+	Sprite self;
 
-    i32 max_selection;
-    OptionsCurseur selection;
-    OptionsCurseur option_selectionee;
+	i32 max_selection;
+	OptionsCurseur selection;
+	OptionsCurseur option_selectionee;
 } Curseur;
 
 #define CURSEUR_DAS G_FPS / 4
@@ -236,8 +236,8 @@ typedef struct BombePulsar {
 #define DURATION_VAGUE_ELECTRIQUE 1 * G_FPS
 
 typedef struct VagueElectrique {
-    Sprite self;
-    float rayon;
+	Sprite self;
+	float rayon;
 } VagueElectrique;
 
 #define TIMER_DISPARITION_ITEM 2 * G_FPS
@@ -280,60 +280,60 @@ typedef enum ProprietaireProjectile {
 
 #define NB_EFFETS 8
 typedef enum EffetAudio {
-    EFFET_PRESENTE,
-    EFFET_NIVEAU,
-    EFFET_TIR,
-    EFFET_EXPLOSION_ENNEMI,
-    EFFET_EXPLOSION_JOUEUR,
-    EFFET_POWERUP,
-    EFFET_VAGUE,
-    EFFET_DOTV_ENTREE
+	EFFET_PRESENTE,
+	EFFET_NIVEAU,
+	EFFET_TIR,
+	EFFET_EXPLOSION_ENNEMI,
+	EFFET_EXPLOSION_JOUEUR,
+	EFFET_POWERUP,
+	EFFET_VAGUE,
+	EFFET_DOTV_ENTREE
 } EffetAudio;
 
 #define NB_MUSIQUE 7
 typedef enum Musique {
-    MUSIQUE_ATW,
-    MUSIQUE_CRTP,
-    MUSIQUE_DYSGENESIS,
-    MUSIQUE_TBOT,
-    MUSIQUE_DOTV,
-    MUSIQUE_EUGENESIS,
-    MUSIQUE_DCQBPM,
+	MUSIQUE_ATW,
+	MUSIQUE_CRTP,
+	MUSIQUE_DYSGENESIS,
+	MUSIQUE_TBOT,
+	MUSIQUE_DOTV,
+	MUSIQUE_EUGENESIS,
+	MUSIQUE_DCQBPM,
 } Musique;
 
 struct DataAudio {
-    i32 ID;
-    const char* fichier;
+	i32 ID;
+	const char* fichier;
 };
 static struct DataAudio MusiqueData[NB_MUSIQUE] = {
-    { MUSIQUE_ATW, "audio\\around the world.wav" },
-    { MUSIQUE_CRTP, "audio\\cant remove the pain.wav" },
-    { MUSIQUE_DYSGENESIS, "audio\\titlescreen.wav" },
-    { MUSIQUE_TBOT, "audio\\the beginning of Time.wav" },
-    { MUSIQUE_DOTV, "audio\\Dance of the Violins.wav" },
-    { MUSIQUE_EUGENESIS, "audio\\eugenesis.wav" },
-    { MUSIQUE_DCQBPM, "audio\\240 Bits Per Mile.wav" }
+	{ MUSIQUE_ATW, "audio\\around the world.wav" },
+	{ MUSIQUE_CRTP, "audio\\cant remove the pain.wav" },
+	{ MUSIQUE_DYSGENESIS, "audio\\titlescreen.wav" },
+	{ MUSIQUE_TBOT, "audio\\the beginning of Time.wav" },
+	{ MUSIQUE_DOTV, "audio\\Dance of the Violins.wav" },
+	{ MUSIQUE_EUGENESIS, "audio\\eugenesis.wav" },
+	{ MUSIQUE_DCQBPM, "audio\\240 Bits Per Mile.wav" }
 };
 static struct DataAudio EffetData[NB_EFFETS] = {
-    { EFFET_PRESENTE, "audio\\presents.wav" },
-    { EFFET_NIVEAU, "audio\\sfx1.wav" },
-    { EFFET_TIR, "audio\\laserShoot.wav" },
-    { EFFET_EXPLOSION_ENNEMI, "audio\\explosion_enemy.wav" },
-    { EFFET_EXPLOSION_JOUEUR, "audio\\explosion.wav" },
-    { EFFET_POWERUP, "audio\\powerup.wav" },
-    { EFFET_VAGUE, "audio\\synth.wav" },
-    { EFFET_DOTV_ENTREE, "audio\\tone.wav" }
+	{ EFFET_PRESENTE, "audio\\presents.wav" },
+	{ EFFET_NIVEAU, "audio\\sfx1.wav" },
+	{ EFFET_TIR, "audio\\laserShoot.wav" },
+	{ EFFET_EXPLOSION_ENNEMI, "audio\\explosion_enemy.wav" },
+	{ EFFET_EXPLOSION_JOUEUR, "audio\\explosion.wav" },
+	{ EFFET_POWERUP, "audio\\powerup.wav" },
+	{ EFFET_VAGUE, "audio\\synth.wav" },
+	{ EFFET_DOTV_ENTREE, "audio\\tone.wav" }
 };
 
 #define NB_CHAINES_SFX 20
 typedef struct Son {
-    Mix_Music* musique;
-    Mix_Chunk* effets_sonnores[NB_CHAINES_SFX];
+	Mix_Music* musique;
+	Mix_Chunk* effets_sonnores[NB_CHAINES_SFX];
 
-    i32 timer;
-    i32 index_prochain_chunk;
-    u8 volume;
-    i32 volume_sdl;
+	i32 timer;
+	i32 index_prochain_chunk;
+	u8 volume;
+	i32 volume_sdl;
 } Son;
 
 #define ALL_CHUNKS -1
@@ -356,14 +356,16 @@ typedef struct Jeu {
 
 	i32 gTimer;
 
-	Vector2* etoiles;
+	SDL_bool arcade_debloque;
+	u8 arcade_etapes;
 	TypeEnnemi* liste_ennemis_arcade;
+	i32 liste_ennemis_arcade_len;
+
+	Vector2* etoiles;
 	i32 timer_changement_niveau;
 	SDL_bool bouger_etoiles;
 	SDL_bool en_cours;
-	SDL_bool arcade_debloque;
 	SDL_bool debug_lvl_select;
-	u8 arcade_etapes;
 	clock_t temps_image;
 	Gamemode gamemode;
 	i32 touches_pesees;

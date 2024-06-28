@@ -628,7 +628,7 @@ Curseur* CreerCurseur(Jeu* jeu) {
     Curseur* curseur = SDL_malloc(sizeof(Curseur));
 
     InitSprite(&curseur->self, jeu);
-    curseur->self.modele = &curseur_modele;
+    curseur->self.modele = curseur_modele;
     curseur->self.modele_longueur = MODELE_CURSEUR_LONGUEURE;
     curseur->max_selection = 1;
     curseur->option_selectionee = CURSEUR_NOUVELLE_PARTIE;
@@ -761,7 +761,9 @@ int InitSDLMixer(Son* son) {
 
     Mix_AllocateChannels(NB_CHAINES_SFX + 1);
     son->volume = 3;
-    son->volume_sdl = son->volume * 8;
+    son->volume_sdl = (i32)(SDL_MIX_MAXVOLUME * (son->volume / 16.0f));
+    Mix_VolumeMusic(son->volume_sdl);
+    Mix_Volume(-1, son->volume_sdl / 2);
     son->index_prochain_chunk = 0;
     son->timer = 0;
 
@@ -860,7 +862,7 @@ void ChangerVolume(Jeu* jeu) {
             if (TouchePesee(jeu, TOUCHE_MOINS) && jeu->son->volume > 0)
                 jeu->son->volume--;
 
-            jeu->son->volume_sdl = (i32)(MIX_MAX_VOLUME * (jeu->son->volume / (float)MAX_VOLUME_GUI));
+            jeu->son->volume_sdl = (i32)(SDL_MIX_MAXVOLUME * (jeu->son->volume / (float)MAX_VOLUME_GUI));
             Mix_VolumeMusic(jeu->son->volume_sdl);
             Mix_Volume(-1, jeu->son->volume_sdl / 2);
         }

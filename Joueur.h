@@ -1,7 +1,7 @@
 #pragma once
 #include "Definitions.h"
 
-int CreerJoueur(Joueur* joueur);
+int CreerJoueur(Jeu* jeu, Joueur* joueur);
 
 void InitializerJoueur(Joueur* joueur);
 

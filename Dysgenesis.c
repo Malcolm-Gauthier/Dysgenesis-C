@@ -1,13 +1,13 @@
 #include "Dysgenesis.h"
 
+extern SDL_bool son_cree;
+extern const TypeEnnemi* liste_niveaux[21];
+extern const i32 liste_niveaux_longueures[21];
+
 const i32 CODE_ARCADE[7] = { 0, TOUCHE_A, TOUCHE_R, TOUCHE_C, TOUCHE_A, TOUCHE_D, TOUCHE_E };
 const i32 TOUCHES_VALIDES_ARCADE = TOUCHE_A | TOUCHE_R | TOUCHE_C | TOUCHE_A | TOUCHE_D | TOUCHE_E;
 
-
-extern SDL_bool son_cree;
-extern const TypeEnnemi* liste_niveaux[20];
-
-int main() {
+int main(int argc, char* argv[]) {
 
 	Jeu* jeu = SDL_malloc(sizeof(Jeu));
 
@@ -118,6 +118,7 @@ int Init(Jeu* jeu) {
 	jeu->bombe->HP = BOMBE_PULSAR_MAX_HP;
 	jeu->gTimer = 0;
 	jeu->gamemode = GAMEMODE_SCENE_INITIALIZATION;
+	jeu->en_cours = SDL_TRUE;
 
 	return 0;
 }
@@ -312,7 +313,7 @@ void Code(Jeu* jeu) {
 			case CURSEUR_CONTINUER:
 				Mix_HaltMusic();
 				jeu->niveau = jeu->niveau_continue - 1;
-				//jeu->ennemis_tues = ARRAY_LEN(liste_niveaux[jeu->niveau]);
+				jeu->ennemis_tues = liste_niveaux_longueures[jeu->niveau];
 				jeu->ennemis_restant = 0;
 
 				InitializerJoueur(jeu->joueur);
@@ -414,7 +415,8 @@ void Code(Jeu* jeu) {
 
 	if (NbEnnemis(jeu) == 0) {
 
-		if (1) {
+		if ((jeu->gamemode == GAMEMODE_AVENTURE && jeu->ennemis_tues >= liste_niveaux_longueures[jeu->niveau]) ||
+			(jeu->gamemode == GAMEMODE_ARCADE && jeu->ennemis_tues >= jeu->liste_ennemis_arcade_len)) {
 
 			ChangerNiveau(jeu);
 		}
@@ -668,6 +670,7 @@ void SDLRender(Jeu* jeu) {
 void FreeMem(Jeu* jeu) {
 
 	SDL_free(jeu->joueur);
+	for (int i = 0; i < NB_ENNEMIS; i++) SDL_free(jeu->ennemis[i].modele_en_marche);
 	SDL_free(jeu->ennemis);
 	SDL_free(jeu->projectiles);
 	SDL_free(jeu->explosions);
