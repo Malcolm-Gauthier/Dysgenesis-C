@@ -138,18 +138,6 @@ void ExistBombe(BombePulsar* bombe) {
 
 int CreerEtoiles(Vector2* etoiles, i32 limite, SDL_Rect bounds) {
 
-    /*if (etoiles != NULL) {
-
-        SDL_free(etoiles);
-    }
-
-    etoiles = SDL_malloc(sizeof(Vector2) * limite);
-
-    if (etoiles == NULL) {
-
-        return 1;
-    }*/
-
     if (bounds.w <= 0 || bounds.h <= 0) {
 
         return 2;
@@ -185,8 +173,8 @@ void BougerEtoiles(Vector2* etoiles, i32 nb_etoiles) {
             continue;
         }
 
-        etoiles[i].x = RNG(0, W_LARGEUR);
-        etoiles[i].y = RNG(0, W_HAUTEUR);
+        etoiles[i].x = RNG(W_SEMI_LARGEUR - 100, W_SEMI_LARGEUR + 100);
+        etoiles[i].y = RNG(W_SEMI_HAUTEUR - 100, W_SEMI_HAUTEUR + 100);
 
         if (etoiles[i].x == W_SEMI_LARGEUR && etoiles[i].y == W_SEMI_HAUTEUR) {
 
@@ -697,6 +685,11 @@ Explosion* CreerExplosion(Jeu* jeu, Vector3 position) {
     explosion->position = position;
     explosion->timer = MAX_PROFONDEUR - (i32)explosion->position.z;
 
+    if (jeu->gamemode < GAMEMODE_SCENE_INITIALIZATION) {
+
+        JouerEffet(jeu, EFFET_EXPLOSION_ENNEMI);
+    }
+
     return explosion;
 }
 
@@ -832,7 +825,7 @@ int JouerEffet(Jeu* jeu, EffetAudio effet_a_jouer) {
         return -3;
     }
     
-    if (Mix_PlayChannel(son->index_prochain_chunk + 1, son->effets_sonnores[son->index_prochain_chunk], 0) != 0) {
+    if (Mix_PlayChannel(son->index_prochain_chunk + 1, son->effets_sonnores[son->index_prochain_chunk], 0) < 0) {
 
         return -4;
     }

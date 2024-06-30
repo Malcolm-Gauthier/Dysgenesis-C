@@ -158,6 +158,7 @@ typedef enum StatusEnnemi {
 #define HAUTEUR_DEFAUT 10.0f
 #define ESPACE_DEFAUT 3.0f
 
+#define MODELE_JOUEUR_LONGUEUR 57
 
 
 typedef struct Explosion {

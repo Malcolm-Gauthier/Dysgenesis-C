@@ -1,5 +1,7 @@
 #include "Projectile.h"
 
+extern Explosion* CreerExplosion(Jeu* jeu, Vector3 position);
+
 const float VITESSE_PROJECTILE = 0.95f;
 
 Projectile* CreerProjectile(Jeu* jeu, Vector3 position, Vector3 destination, ProprietaireProjectile proprietaire, u8 ID) {
@@ -43,7 +45,7 @@ Projectile* CreerProjectile(Jeu* jeu, Vector3 position, Vector3 destination, Pro
 
 		if (jeu->joueur->powerup == TYPEITEM_LASER) {
 
-			projectile->laser;
+			projectile->laser = SDL_TRUE;
 		}
 	}
 
@@ -280,9 +282,14 @@ void RenderProjectile(Projectile* projectile) {
 
 		for (int i = 0; i < MAX_PROFONDEUR; i++) {
 
-			const int LARGEUR_MAX_LASER = 5;
+			const float LARGEUR_MAX_LASER = 5.0f;
 
 			largeur_laser = (int)(((MAX_PROFONDEUR - i) / (float)MAX_PROFONDEUR) * LARGEUR_MAX_LASER);
+
+			if (largeur_laser == 0) {
+				largeur_laser++;
+			}
+
 			projectile->self.position.z = i;
 
 			PositionsSurEcran(projectile, positions);

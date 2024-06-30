@@ -5,8 +5,11 @@ extern Projectile* CreerProjectile(Jeu* jeu, Vector3 position, Vector3 destinati
 extern int PositionLigneModele(Sprite* sprite, i32 index_ligne, float* output);
 extern SDL_bool JoueurMort(Joueur* joueur);
 extern int InitSprite(Sprite* sprite, Jeu* jeu);
+extern const Vector3 MODELE_P[];
+extern const i32 SAUTS_MODELE_AUCUN;
 
-static Vector3 MODELE_E1[] = {
+#define MODELE_E1_LEN 19
+const Vector3 MODELE_E1[] = {
 	{0, 0, -20},
 	{-16, 0, 10},
 	{16, 0, 10},
@@ -27,8 +30,9 @@ static Vector3 MODELE_E1[] = {
 	{0, 5, 0},
 	{0, 5, 0}
 };
-static i32 MODELE_E1_SAUTS[] = { 12, 17, -1 };
-static Vector3 MODELE_E2[] = {
+const i32 MODELE_E1_SAUTS[] = { 12, 17, -1 };
+#define MODELE_E2_LEN 67
+const Vector3 MODELE_E2[] = {
 	{-30, 0, 0},
 	{-15, 0, 26},
 	{0, 50, 0},
@@ -97,8 +101,9 @@ static Vector3 MODELE_E2[] = {
 	{12, -10, 3},
 	{12, -10, 21}
 };
-static i32 MODELE_E2_SAUTS[] = { 48, 50, -1 };
-static Vector3 MODELE_E3[] = {
+const i32 MODELE_E2_SAUTS[] = { 48, 50, -1 };
+#define MODELE_E3_LEN 27
+const Vector3 MODELE_E3[] = {
 	{-50, 0, 0},
 	{-50, -10, 40},
 	{-45, 0, 0},
@@ -127,8 +132,9 @@ static Vector3 MODELE_E3[] = {
 	{-20, 10, -10},
 	{-50, 0, 0}
 };
-static i32 MODELE_E3_SAUTS[] = { -1 };
-static Vector3 MODELE_E5[] = {
+const i32 MODELE_E3_SAUTS[] = { -1 };
+#define MODELE_E5_LEN 83
+const Vector3 MODELE_E5[] = {
 	{-15, 45, 10},
 	{-10, 30, 10},
 	{-25, 30, 50},
@@ -213,8 +219,9 @@ static Vector3 MODELE_E5[] = {
 	{-50, 0, -10},
 	{-40, 30, -10}
 };
-static i32 MODELE_E5_SAUTS[] = { -1 };
-static Vector3 MODELE_E6[] = {
+const i32 MODELE_E5_SAUTS[] = { -1 };
+#define MODELE_E6_LEN 7
+const Vector3 MODELE_E6[] = {
 	{-25, 0, 0},
 	{0, -10, 0},
 	{25, 0, 0},
@@ -223,8 +230,9 @@ static Vector3 MODELE_E6[] = {
 	{0, -10, -30},
 	{-25, 0, 0}
 };
-static i32 MODELE_E6_SAUTS[] = { -1 };
-static Vector3 MODELE_E7[] = {
+const i32 MODELE_E6_SAUTS[] = { -1 };
+#define MODELE_E7_LEN 9
+const Vector3 MODELE_E7[] = {
 	{0, 20, 0},
 	{40, 0, 0},
 	{0, -20, 0},
@@ -235,14 +243,15 @@ static Vector3 MODELE_E7[] = {
 	{-10, 0, 0},
 	{0, 20, 0}
 };
-static i32 MODELE_E7_SAUTS[] = { -1 };
-static Vector3 MODELE_E7_1[] = {
+const i32 MODELE_E7_SAUTS[] = { -1 };
+#define MODELE_E7_1_LEN 4
+const Vector3 MODELE_E7_1[] = {
 	{0, 10, 0},
 	{-8, -6, 0},
 	{8, -6, 0},
 	{0, 10, 0}
 };
-static i32 MODELE_E7_1_SAUTS[] = { -1 };
+const i32 MODELE_E7_1_SAUTS[] = { -1 };
 
 typedef struct EnnemiData {
 	TypeEnnemi ID;
@@ -273,7 +282,216 @@ const EnnemiData DataEnnemi[DATAENNEMI_CAPACITE] = {
 		.couleure = {.r = 255,.g = 255,.b = 0,.a = 255},
 		.indexs_tir = {18, -1},
 		.modele = MODELE_E1,
+		.modele_longueur = MODELE_E1_LEN,
 		.modele_sauts = MODELE_E1_SAUTS
+	},
+	{
+		.ID = TYPEENNEMI_DIAMANT,
+		.vitesse = VITESSE_MOYENNE_ENNEMI / 2,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI,
+		.vitesse_tir = 2 * VITESSE_MOYENNE_TIR_ENNEMI,
+		.hp_max = 3,
+		.largeur = 30,
+		.couleure = {.r = 255,.g = 128,.b = 0,.a = 255},
+		.indexs_tir = {61, 45},
+		.modele = MODELE_E2,
+		.modele_longueur = MODELE_E2_LEN,
+		.modele_sauts = MODELE_E2_SAUTS
+	},
+	{
+		.ID = TYPEENNEMI_TOURNANT,
+		.vitesse = VITESSE_MOYENNE_ENNEMI / 2,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI,
+		.vitesse_tir = 2 * VITESSE_MOYENNE_TIR_ENNEMI,
+		.hp_max = 3,
+		.largeur = 50,
+		.couleure = {.r = 0,.g = 255,.b = 0,.a = 255},
+		.indexs_tir = {0, 8},
+		.modele = MODELE_E3,
+		.modele_longueur = MODELE_E3_LEN,
+		.modele_sauts = MODELE_E3_SAUTS
+	},
+	{
+		.ID = TYPEENNEMI_ENERGIE,
+		.vitesse = 0,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI / 1.5f,
+		.vitesse_tir = 0,
+		.hp_max = 10,
+		.largeur = 50,
+		.couleure = {.r = 0,.g = 255,.b = 255,.a = 255},
+		.indexs_tir = {-1, -1},
+		.modele = NULL,
+		.modele_longueur = 0,
+		.modele_sauts = {-1}
+	},
+	{
+		.ID = TYPEENNEMI_CROISSANT,
+		.vitesse = VITESSE_MOYENNE_ENNEMI * 0.75f,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI,
+		.vitesse_tir = 4 * VITESSE_MOYENNE_TIR_ENNEMI,
+		.hp_max = 10,
+		.largeur = 60,
+		.couleure = {.r = 0,.g = 0,.b = 255,.a = 255},
+		.indexs_tir = {2, 21},
+		.modele = MODELE_E5,
+		.modele_longueur = MODELE_E5_LEN,
+		.modele_sauts = MODELE_E5_SAUTS
+	},
+	{
+		.ID = TYPEENNEMI_DUPLIQUEUR,
+		.vitesse = VITESSE_MOYENNE_ENNEMI / 2,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI / 2,
+		.vitesse_tir = 2 * VITESSE_MOYENNE_TIR_ENNEMI,
+		.hp_max = 7,
+		.largeur = 40,
+		.couleure = {.r = 128,.g = 0,.b = 128,.a = 255},
+		.indexs_tir = {3, -1},
+		.modele = MODELE_E6,
+		.modele_longueur = MODELE_E6_LEN,
+		.modele_sauts = MODELE_E6_SAUTS
+	},
+	{
+		.ID = TYPEENNEMI_PATRA,
+		.vitesse = VITESSE_MOYENNE_ENNEMI * 1,
+		.vitesse_z = 0,
+		.vitesse_tir = 3 * VITESSE_MOYENNE_TIR_ENNEMI,
+		.hp_max = 10,
+		.largeur = 100,
+		.couleure = {.r = 255,.g = 0,.b = 255,.a = 255},
+		.indexs_tir = {5, -1},
+		.modele = MODELE_E7,
+		.modele_longueur = MODELE_E7_LEN,
+		.modele_sauts = MODELE_E7_SAUTS
+	},
+	{
+		.ID = TYPEENNEMI_OCTAHEDRON_DUR,
+		.vitesse = VITESSE_MOYENNE_ENNEMI * 0.8f,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI,
+		.vitesse_tir = 1 * VITESSE_MOYENNE_TIR_ENNEMI,
+		.hp_max = 3,
+		.largeur = 30,
+		.couleure = {.r = 128,.g = 128,.b = 0,.a = 255},
+		.indexs_tir = {18},
+		.modele = MODELE_E1,
+		.modele_longueur = MODELE_E1_LEN,
+		.modele_sauts = MODELE_E1_SAUTS
+	},
+	{
+		.ID = TYPEENNEMI_DIAMANT_DUR,
+		.vitesse = VITESSE_MOYENNE_ENNEMI * 1.0f,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI,
+		.vitesse_tir = 2 * VITESSE_MOYENNE_TIR_ENNEMI,
+		.hp_max = 5,
+		.largeur = 30,
+		.couleure = {.r = 128,.g = 64,.b = 0,.a = 255},
+		.indexs_tir = {61, 45},
+		.modele = MODELE_E2,
+		.modele_longueur = MODELE_E2_LEN,
+		.modele_sauts = MODELE_E2_SAUTS
+	},
+	{
+		.ID = TYPEENNEMI_TOURNANT_DUR,
+		.vitesse = VITESSE_MOYENNE_ENNEMI * 1.0f,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI,
+		.vitesse_tir = 2 * VITESSE_MOYENNE_TIR_ENNEMI,
+		.hp_max = 7,
+		.largeur = 50,
+		.couleure = {.r = 0,.g = 128,.b = 0,.a = 255},
+		.indexs_tir = {0, 8},
+		.modele = MODELE_E3,
+		.modele_longueur = MODELE_E3_LEN,
+		.modele_sauts = MODELE_E3_SAUTS
+	},
+	{
+		.ID = TYPEENNEMI_ENERGIE_DUR,
+		.vitesse = VITESSE_MOYENNE_ENNEMI / 2,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI * 1.5f,
+		.vitesse_tir = 1 * VITESSE_MOYENNE_TIR_ENNEMI,
+		.hp_max = 15,
+		.largeur = 50,
+		.couleure = {.r = 0,.g = 128,.b = 128,.a = 255},
+		.indexs_tir = {-1, -1},
+		.modele = NULL,
+		.modele_longueur = 0,
+		.modele_sauts = {-1}
+	},
+	{
+		.ID = TYPEENNEMI_CROISSANT_DUR,
+		.vitesse = VITESSE_MOYENNE_ENNEMI * 1.0f,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI,
+		.vitesse_tir = 3 * VITESSE_MOYENNE_TIR_ENNEMI,
+		.hp_max = 12,
+		.largeur = 60,
+		.couleure = {.r = 0,.g = 0,.b = 128,.a = 255},
+		.indexs_tir = {2, 21},
+		.modele = MODELE_E5,
+		.modele_longueur = MODELE_E5_LEN,
+		.modele_sauts = MODELE_E5_SAUTS
+	},
+	{
+		.ID = TYPEENNEMI_DUPLIQUEUR_DUR,
+		.vitesse = VITESSE_MOYENNE_ENNEMI * 1.25f,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI / 4,
+		.vitesse_tir = 1 * VITESSE_MOYENNE_TIR_ENNEMI,
+		.hp_max = 10,
+		.largeur = 40,
+		.couleure = {.r = 64,.g = 0,.b = 128,.a = 255},
+		.indexs_tir = {3, -1},
+		.modele = MODELE_E6,
+		.modele_longueur = MODELE_E6_LEN,
+		.modele_sauts = MODELE_E6_SAUTS
+	},
+	{
+		.ID = TYPEENNEMI_PATRA_DUR,
+		.vitesse = VITESSE_MOYENNE_ENNEMI,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI / 4,
+		.vitesse_tir = 4 * VITESSE_MOYENNE_TIR_ENNEMI,
+		.hp_max = 15,
+		.largeur = 100,
+		.couleure = {.r = 128,.g = 0,.b = 128,.a = 255},
+		.indexs_tir = {5, -1},
+		.modele = MODELE_E7,
+		.modele_longueur = MODELE_E7_LEN,
+		.modele_sauts = MODELE_E7_SAUTS
+	},
+	{
+		.ID = TYPEENNEMI_BOSS,
+		.vitesse = VITESSE_MOYENNE_ENNEMI * 4.0f,
+		.vitesse_z = 0,
+		.vitesse_tir = 3.0f * VITESSE_MOYENNE_TIR_ENNEMI,
+		.hp_max = BOSS_MAX_HP,
+		.largeur = 100,
+		.couleure = {.r = 255,.g = 0,.b = 0,.a = 255},
+		.indexs_tir = {1, 16},
+		.modele = MODELE_P,
+		.modele_longueur = MODELE_JOUEUR_LONGUEUR,
+		.modele_sauts = &SAUTS_MODELE_AUCUN
+	},
+	{
+		.ID = TYPEENNEMI_PATRA_MINION,
+		.vitesse = VITESSE_MOYENNE_ENNEMI,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI * 1.0f,
+		.vitesse_tir = 0,
+		.hp_max = 1,
+		.largeur = 30,
+		.couleure = {.r = 255,.g = 0,.b = 255,.a = 255},
+		.indexs_tir = {-1, -1},
+		.modele = MODELE_E7_1,
+		.modele_longueur = MODELE_E7_1_LEN,
+		.modele_sauts = MODELE_E7_1_SAUTS
+	},
+	{
+		.ID = TYPEENNEMI_PATRA_MINION_DUR,
+		.vitesse = VITESSE_MOYENNE_ENNEMI,
+		.vitesse_z = VITESSE_MOYENNE_Z_ENNEMI * 1.5f,
+		.vitesse_tir = 0,
+		.hp_max = 1,
+		.largeur = 30,
+		.couleure = {.r = 128,.g = 0,.b = 128,.a = 255},
+		.indexs_tir = {-1, -1},
+		.modele = MODELE_E7_1,
+		.modele_longueur = MODELE_E7_1_LEN,
+		.modele_sauts = MODELE_E7_1_SAUTS
 	},
 };
 
@@ -340,6 +558,7 @@ Ennemi* CreerEnnemi(Jeu* jeu, TypeEnnemi type, StatusEnnemi statut, Ennemi* pare
 		ennemi->modele_en_marche = SDL_malloc(sizeof(Vector3) * ennemi->self.modele_longueur);
 		if (ennemi->modele_en_marche == NULL) return NULL;
 		SDL_memcpy(ennemi->modele_en_marche, ennemi->self.modele, sizeof(Vector3) * ennemi->self.modele_longueur);
+		ennemi->self.modele = ennemi->modele_en_marche;
 	}
 
 	ennemi->self.afficher = SDL_TRUE;
@@ -783,7 +1002,7 @@ SDL_bool CodeBoss(Ennemi* ennemi) {
 
 int CollisionProjectileEnnemi(Ennemi* ennemi, Projectile* projectile) {
 
-	if (!ennemi->self.afficher || projectile->proprietaire == PROPRIETAIREPROJ_ENNEMI) {
+	if (!ennemi->self.afficher || !projectile->self.afficher || projectile->proprietaire == PROPRIETAIREPROJ_ENNEMI) {
 
 		return 0;
 	}

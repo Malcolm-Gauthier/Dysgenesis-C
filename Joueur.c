@@ -1,7 +1,6 @@
 #include "Joueur.h"
 #include "Misc.h"
 
-#define MODELE_JOUEUR_LONGUEUR 57
 const Vector3 MODELE_P[] = {
 	{-50,0,0}, // rouge
 	{-46,-2,-50}, // orange

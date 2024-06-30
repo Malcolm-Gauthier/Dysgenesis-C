@@ -114,11 +114,15 @@ int Init(Jeu* jeu) {
 	for (int i = 0; i < NB_ITEMS; i++) jeu->items[i].self.afficher = SDL_FALSE;
 	CreerCurseur(jeu);
 	jeu->vague_electrique->self.afficher = SDL_FALSE;
+	jeu->vague_electrique->self.jeu = jeu;
 	jeu->bombe->jeu = jeu;
 	jeu->bombe->HP = BOMBE_PULSAR_MAX_HP;
 	jeu->gTimer = 0;
 	jeu->gamemode = GAMEMODE_SCENE_INITIALIZATION;
 	jeu->en_cours = SDL_TRUE;
+	jeu->bouger_etoiles = SDL_TRUE;
+	jeu->arcade_debloque = SDL_FALSE;
+	jeu->liste_ennemis_arcade = NULL;
 
 	return 0;
 }
@@ -328,6 +332,7 @@ void Code(Jeu* jeu) {
 
 			case CURSEUR_ARCADE:
 				jeu->niveau = 0;
+				jeu->ennemis_tues = jeu->liste_ennemis_arcade_len;
 				InitializerJoueur(jeu->joueur);
 				jeu->joueur->self.afficher = SDL_TRUE;
 				JouerMusique(jeu, MUSIQUE_DCQBPM, SDL_TRUE);
@@ -571,7 +576,7 @@ void Render(Jeu* jeu) {
 		}
 		
 		float vagues_reste = SDL_fmodf(jeu->joueur->vagues_electriques, 1.0f);
-		barre_hud.w = (int)(SDL_fmodf(vagues_reste, 0.01f) * 100);
+		barre_hud.w = (int)((vagues_reste - SDL_fmodf(vagues_reste, 0.01f)) * 100);
 		SDL_RenderFillRect(jeu->render, &barre_hud);
 
 		DisplayText(jeu, "    hp:\nvagues:", (Vector2) { 10, 15 }, 2, BLANC, OPAQUE, NO_SCROLL);
