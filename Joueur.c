@@ -192,7 +192,7 @@ static void AnimationMort(Joueur* joueur) {
 		JouerEffet(joueur->self.jeu, EFFET_EXPLOSION_JOUEUR);
 		joueur->self.jeu->bouger_etoiles = SDL_TRUE;
 
-		i32* lignes_a_sauter_temporaire = malloc(sizeof(i32) * joueur->self.modele_longueur);
+		i32* lignes_a_sauter_temporaire = SDL_malloc(sizeof(i32) * joueur->self.modele_longueur);
 		if (!lignes_a_sauter_temporaire)
 			return;
 
@@ -219,11 +219,15 @@ static void AnimationMort(Joueur* joueur) {
 
 	if (joueur->self.timer > IMAGES_AVANT_TEXTE) {
 
-		DisplayText(joueur->self.jeu, "game over", (Vector2) { 0, 0 }, 5, 0, joueur->self.timer - 120, 0);
+		DisplayText(joueur->self.jeu, "game over", (Vector2) { CENTRE, CENTRE }, 5, BLANC, joueur->self.timer - 120, NO_SCROLL);
 
 		if (joueur->self.jeu->gamemode == GAMEMODE_ARCADE) {
 
-			DisplayText(joueur->self.jeu, "0", (Vector2) { 0, 0 }, 5, 0, joueur->self.timer - 120, 0);
+			char num[10];
+			char txt[20] = "score: ";
+			SDL_itoa(joueur->self.jeu->niveau, num, 10);
+			SDL_strlcat(txt, num, 20);
+			DisplayText(joueur->self.jeu, txt, (Vector2) { CENTRE, W_SEMI_HAUTEUR + 30 }, 3, BLANC, joueur->self.timer - 120, NO_SCROLL);
 		}
 	}
 
@@ -233,11 +237,15 @@ static void AnimationMort(Joueur* joueur) {
 		joueur->self.timer = 0;
 
 		joueur->self.indexs_lignes_sauter = NULL;
-		free(lignes_a_sauter_temporaire);
+		SDL_free(lignes_a_sauter_temporaire);
+		joueur->self.indexs_lignes_sauter = &SAUTS_MODELE_AUCUN;
 
 		JouerMusique(joueur->self.jeu, MUSIQUE_DYSGENESIS, SDL_TRUE);
 		joueur->self.jeu->bouger_etoiles = SDL_TRUE;
-		//vider ennemis, explosions & projectiles
+		ClearEnnemis(joueur->self.jeu);
+		ClearProjectiles(joueur->self.jeu);
+		ClearExplosions(joueur->self.jeu);
+		ClearItems(joueur->self.jeu);
 		joueur->self.jeu->gamemode = GAMEMODE_MENU_PRINCIPAL;
 		return;
 	}

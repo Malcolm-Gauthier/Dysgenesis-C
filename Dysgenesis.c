@@ -123,6 +123,7 @@ int Init(Jeu* jeu) {
 	jeu->bouger_etoiles = SDL_TRUE;
 	jeu->arcade_debloque = SDL_FALSE;
 	jeu->liste_ennemis_arcade = NULL;
+	jeu->niveau_continue = 1;
 
 	return 0;
 }

@@ -566,7 +566,7 @@ Ennemi* CreerEnnemi(Jeu* jeu, TypeEnnemi type, StatusEnnemi statut, Ennemi* pare
 
 	if (parent != NULL) {
 
-		ennemi->self.position = jeu->joueur->self.position;
+		ennemi->self.position = parent->self.position;
 	}
 	else {
 
@@ -823,7 +823,7 @@ void ActualiserModeleEnnemi(Ennemi* ennemi) {
 
 SDL_bool CodeBoss(Ennemi* ennemi) {
 
-	if (ennemi->statut != STATUSENNEMI_BOSS_NORMAL) {
+	if (ennemi->type != TYPEENNEMI_BOSS || ennemi->statut == STATUSENNEMI_BOSS_NORMAL) {
 
 		return SDL_FALSE;
 	}
@@ -849,7 +849,7 @@ SDL_bool CodeBoss(Ennemi* ennemi) {
 			ennemi->statut = STATUSENNEMI_BOSS_INIT_3;
 			ennemi->self.timer = 0;
 			ennemi->velocite.y = -10;
-			ennemi->self.jeu->bouger_etoiles = SDL_TRUE;
+			ennemi->self.jeu->bouger_etoiles = SDL_FALSE;
 		}
 
 		break;
@@ -1051,8 +1051,6 @@ int CollisionProjectileEnnemi(Ennemi* ennemi, Projectile* projectile) {
 		return 0;
 	}
 
-	ennemi->self.afficher = SDL_FALSE;
-
 	if (ennemi->type == TYPEENNEMI_BOSS) {
 
 		ennemi->statut = STATUSENNEMI_BOSS_MORT;
@@ -1069,6 +1067,7 @@ int CollisionProjectileEnnemi(Ennemi* ennemi, Projectile* projectile) {
 
 	if (ennemi->statut > STATUSENNEMI_DUPLIQUEUR_0_RESTANT && ennemi->statut <= STATUSENNEMI_DUPLIQUEUR_2_RESTANT) {
 
+		ennemi->self.afficher = SDL_TRUE;
 		const i32 DUPLIQUEUR_DIST_SEPARATION_ENFANT = 30;
 		StatusEnnemi nouveau_status = ennemi->statut - 1;
 
@@ -1078,6 +1077,7 @@ int CollisionProjectileEnnemi(Ennemi* ennemi, Projectile* projectile) {
 		CreerEnnemi(ennemi->self.jeu, ennemi->type, nouveau_status, ennemi);
 
 		ennemi->statut = STATUSENNEMI_MORT;
+		ennemi->self.afficher = SDL_FALSE;
 		return 1;
 	}
 
@@ -1117,6 +1117,11 @@ int CollisionJoueurEnnemi(Ennemi* ennemi, Joueur* joueur) {
 
 	ennemi->statut = STATUSENNEMI_MORT;
 	ennemi->self.afficher = SDL_FALSE;
+
+	if (JoueurMort(joueur)) {
+
+		joueur->self.timer = 0;
+	}
 
 	return 1;
 }

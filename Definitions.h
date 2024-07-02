@@ -489,6 +489,11 @@ inline float DistanceV2(Vector2 a, Vector2 b) {
 
 inline i32 RNG(i32 min, i32 max) {
 
+	if (min - max == 0) {
+
+		return min;
+	}
+
 	return rand() % SDL_abs(max - min) + min;
 }
 
