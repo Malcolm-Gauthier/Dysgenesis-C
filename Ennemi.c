@@ -5,6 +5,7 @@ extern Projectile* CreerProjectile(Jeu* jeu, Vector3 position, Vector3 destinati
 extern int PositionLigneModele(Sprite* sprite, i32 index_ligne, float* output);
 extern SDL_bool JoueurMort(Joueur* joueur);
 extern int InitSprite(Sprite* sprite, Jeu* jeu);
+extern void DisplayText(Jeu* jeu, char* text, Vector2 position, float size, int color, int alpha, int scroll);
 extern const Vector3 MODELE_P[];
 extern const i32 SAUTS_MODELE_AUCUN;
 
@@ -849,6 +850,7 @@ SDL_bool CodeBoss(Ennemi* ennemi) {
 			ennemi->statut = STATUSENNEMI_BOSS_INIT_3;
 			ennemi->self.timer = 0;
 			ennemi->velocite.y = -10;
+			ennemi->self.jeu->joueur->velocite.y = -20;
 			ennemi->self.jeu->bouger_etoiles = SDL_FALSE;
 		}
 
@@ -988,7 +990,8 @@ SDL_bool CodeBoss(Ennemi* ennemi) {
 
 		if (ennemi->self.timer) {
 
-			ennemi->self.jeu->gamemode = GAMEMODE_SCENE_MAUVAISE_FIN;
+			ennemi->self.jeu->gamemode = GAMEMODE_SCENE_GENERIQUE;
+			ennemi->self.jeu->gTimer = 0;
 
 			ClearEnnemis(ennemi->self.jeu);
 			ClearExplosions(ennemi->self.jeu);

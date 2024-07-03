@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 		SDLRender(jeu);
 
 #ifndef DEBUG_FPS_INFINI
-		while (jeu->temps_image > clock() - CLOCKS_PER_SEC / G_FPS);
+		while (jeu->temps_image > clock() - CLOCKS_PER_SEC / (jeu->gamemode == GAMEMODE_SCENE_GENERIQUE ? G_FPS / 2 : G_FPS));
 #endif
 
 		jeu->temps_image = clock();

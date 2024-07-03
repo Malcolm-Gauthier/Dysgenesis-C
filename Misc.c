@@ -1,5 +1,10 @@
 #include "Misc.h"
 
+extern Ennemi* CreerEnnemi(Jeu* jeu, TypeEnnemi type, StatusEnnemi statut, Ennemi* parent);
+extern int PositionLigneModele(Sprite* sprite, i32 index_ligne, float* output);
+extern void ActualiserModeleEnnemi(Ennemi* ennemi);
+extern void RenderEnnemi(Ennemi* ennemi);
+
 #define HYP_BOMBE_DATA_LEN 72
 const float hyperbole_bleue_bombe_pulsar_data[HYP_BOMBE_DATA_LEN] = {
     -0.35f, -0.95f, -0.4f, -1.55f,
@@ -95,7 +100,8 @@ int AnimationExplosionBombe(BombePulsar* bombe) {
     else {
 
         bombe->timer = 0;
-        bombe->jeu->gamemode = GAMEMODE_SCENE_BONNE_FIN;
+        bombe->jeu->gamemode = GAMEMODE_SCENE_GENERIQUE;
+        bombe->jeu->gTimer = 0;
         bombe->HP = BOMBE_PULSAR_MAX_HP;
     }
 
@@ -110,6 +116,11 @@ int CollisionBombeProjectile(BombePulsar* bombe, Jeu* jeu) {
     }
 
     for (int i = 0; i < NB_PROJECTILES; i++) {
+
+        if (jeu->projectiles[i].self.afficher == SDL_FALSE) {
+
+            continue;
+        }
 
         if (jeu->projectiles[i].self.position.z < MAX_PROFONDEUR - 1) {
 
@@ -229,6 +240,8 @@ void Scene0(Jeu* jeu, i32 gTimer) {
     }
 }
 
+Ennemi* ens_s4[3];
+
 void Scene4(Jeu* jeu, i32 gTimer) {
 
 #ifdef DEBUG_CUTSCENE_SKIP
@@ -255,54 +268,59 @@ void Scene4(Jeu* jeu, i32 gTimer) {
         short extra_y = 0;
         if (jeu->gTimer >= 300)
             extra_y = (short)(jeu->gTimer - 300);
-        DisplayText("dysgenesis", new Vector2(CENTRE, 540 - extra_y * 3), 4, alpha: alpha, scroll : ((jeu->gTimer - 60) / 5));
+        DisplayText(jeu, "dysgenesis", (Vector2) { CENTRE, 540 - extra_y * 3 }, 4, BLANC, alpha, ((jeu->gTimer - 60) / 5));
     }
     if (jeu->gTimer >= 300 && jeu->gTimer < 700)
-        DisplayText("conception:\nmalcolm gauthier", new Vector2(100, W_HAUTEUR - (jeu->gTimer - 300) * 3), 4, scroll: (jeu->gTimer - 310) / 5);
+        DisplayText(jeu, "conception:\nmalcolm gauthier", (Vector2){100, W_HAUTEUR - (jeu->gTimer - 300) * 3 }, 4, BLANC, OPAQUE, (jeu->gTimer - 310) / 5);
+
     if (jeu->gTimer >= 540 && jeu->gTimer < 940)
-        DisplayText("         modèles:\nmalcolm gauthier", new Vector2(W_LARGEUR - 620, W_HAUTEUR - (jeu->gTimer - 540) * 3), 4, scroll: (jeu->gTimer - 540) / 5);
+        DisplayText(jeu, "         modèles:\nmalcolm gauthier", (Vector2){W_LARGEUR - 620, W_HAUTEUR - (jeu->gTimer - 540) * 3 }, 4, BLANC, OPAQUE, (jeu->gTimer - 540) / 5);
+
     if (jeu->gTimer >= 780 && jeu->gTimer < 1180)
-        DisplayText("programmation:\nmalcolm gauthier", new Vector2(100, W_HAUTEUR - (jeu->gTimer - 780) * 3), 4, scroll: (jeu->gTimer - 780) / 5);
+        DisplayText(jeu, "programmation:\nmalcolm gauthier", (Vector2){100, W_HAUTEUR - (jeu->gTimer - 780) * 3 }, 4, BLANC, OPAQUE, (jeu->gTimer - 780) / 5);
+
     if (jeu->gTimer >= 1020 && jeu->gTimer < 1420)
-        DisplayText(" effets sonnores:\nmalcolm gauthier", new Vector2(W_LARGEUR - 620, W_HAUTEUR - (jeu->gTimer - 1020) * 3), 4, scroll: (jeu->gTimer - 1020) / 5);
+        DisplayText(jeu, " effets sonnores:\nmalcolm gauthier", (Vector2){W_LARGEUR - 620, W_HAUTEUR - (jeu->gTimer - 1020) * 3 }, 4, BLANC, OPAQUE, (jeu->gTimer - 1020) / 5);
+
     if (jeu->gTimer >= 1260 && jeu->gTimer < 1660)
-        DisplayText("musique", new Vector2(CENTRE, W_HAUTEUR - (jeu->gTimer - 1260) * 3), 4, scroll: (jeu->gTimer - 1260) / 5);
+        DisplayText(jeu, "musique", (Vector2){CENTRE, W_HAUTEUR - (jeu->gTimer - 1260) * 3 }, 4, BLANC, OPAQUE, (jeu->gTimer - 1260) / 5);
+
     if (jeu->gTimer >= 1300 && jeu->gTimer < 1700)
     {
-        DisplayText("\"dance of the violins\"", new Vector2(CENTRE, W_HAUTEUR - (jeu->gTimer - 1300) * 3), 3, scroll: (jeu->gTimer - 1300) / 5);
-        DisplayText("jesse valentine (f-777)", new Vector2(CENTRE, W_HAUTEUR - (jeu->gTimer - 1320) * 3), 3, scroll: (jeu->gTimer - 1320) / 5);
+        DisplayText(jeu, "\"dance of the violins\"", (Vector2){CENTRE, W_HAUTEUR - (jeu->gTimer - 1300) * 3 }, 3, BLANC, OPAQUE, (jeu->gTimer - 1300) / 5);
+        DisplayText(jeu, "jesse valentine (f-777)", (Vector2){CENTRE, W_HAUTEUR - (jeu->gTimer - 1320) * 3}, 3, BLANC, OPAQUE, (jeu->gTimer - 1320) / 5);
     }
     if (jeu->gTimer >= 1400 && jeu->gTimer < 1800)
     {
-        DisplayText("\"240 bits per mile\"", new Vector2(CENTRE, W_HAUTEUR - (jeu->gTimer - 1400) * 3), 3, scroll: (jeu->gTimer - 1400) / 5);
-        DisplayText("leon riskin", new Vector2(CENTRE, W_HAUTEUR - (jeu->gTimer - 1420) * 3), 3, scroll: (jeu->gTimer - 1420) / 5);
+        DisplayText(jeu, "\"240 bits per mile\"", (Vector2){CENTRE, W_HAUTEUR - (jeu->gTimer - 1400) * 3}, 3, BLANC, OPAQUE, (jeu->gTimer - 1400) / 5);
+        DisplayText(jeu, "leon riskin", (Vector2){CENTRE, W_HAUTEUR - (jeu->gTimer - 1420) * 3}, 3, BLANC, OPAQUE, (jeu->gTimer - 1420) / 5);
     }
     if (jeu->gTimer >= 1500 && jeu->gTimer < 1900)
     {
-        DisplayText("\"dysgenesis\"         \"eugenesis\"", new Vector2(CENTRE, W_HAUTEUR - (jeu->gTimer - 1500) * 3), 3, scroll: (jeu->gTimer - 1500) / 3);
-        DisplayText("malcolm gauthier", new Vector2(CENTRE, W_HAUTEUR - (jeu->gTimer - 1520) * 3), 3, scroll: (jeu->gTimer - 1520) / 5);
+        DisplayText(jeu, "\"dysgenesis\"         \"eugenesis\"", (Vector2){CENTRE, W_HAUTEUR - (jeu->gTimer - 1500) * 3}, 3, BLANC, OPAQUE, (jeu->gTimer - 1500) / 3);
+        DisplayText(jeu, "malcolm gauthier", (Vector2){CENTRE, W_HAUTEUR - (jeu->gTimer - 1520) * 3}, 3, BLANC, OPAQUE, (jeu->gTimer - 1520) / 5);
     }
     if (jeu->gTimer >= 1600 && jeu->gTimer < 2000)
     {
-        DisplayText("autres musiques", new Vector2(CENTRE, W_HAUTEUR - (jeu->gTimer - 1600) * 3), 3, scroll: (jeu->gTimer - 1600) / 5);
-        DisplayText("malcolm gauthier, mélodies non-originales", new Vector2(CENTRE, W_HAUTEUR - (jeu->gTimer - 1620) * 3), 3, scroll: (jeu->gTimer - 1620) / 3);
+        DisplayText(jeu, "autres musiques", (Vector2){CENTRE, W_HAUTEUR - (jeu->gTimer - 1600) * 3}, 3, BLANC, OPAQUE, (jeu->gTimer - 1600) / 5);
+        DisplayText(jeu, "malcolm gauthier, mélodies non-originales", (Vector2){CENTRE, W_HAUTEUR - (jeu->gTimer - 1620) * 3}, 3, BLANC, OPAQUE, (jeu->gTimer - 1620) / 3);
     }
     if (jeu->gTimer >= 1740 && jeu->gTimer < 2140)
-        DisplayText("mélodies utilisées", new Vector2(100, W_HAUTEUR - (jeu->gTimer - 1740) * 3), 4, scroll: (jeu->gTimer - 1740) / 5);
+        DisplayText(jeu, "mélodies utilisées", (Vector2){100, W_HAUTEUR - (jeu->gTimer - 1740) * 3}, 4, BLANC, OPAQUE, (jeu->gTimer - 1740) / 5);
     if (jeu->gTimer >= 1780 && jeu->gTimer < 2180)
     {
-        DisplayText("\"can't remove the pain\"", new Vector2(400, W_HAUTEUR - (jeu->gTimer - 1780) * 3), 3, scroll: (jeu->gTimer - 1780) / 5);
-        DisplayText("todd porter et herman miller", new Vector2(400, W_HAUTEUR - (jeu->gTimer - 1800) * 3), 3, scroll: (jeu->gTimer - 1800) / 5);
+        DisplayText(jeu, "\"can't remove the pain\"", (Vector2){400, W_HAUTEUR - (jeu->gTimer - 1780) * 3}, 3, BLANC, OPAQUE, (jeu->gTimer - 1780) / 5);
+        DisplayText(jeu, "todd porter et herman miller", (Vector2){400, W_HAUTEUR - (jeu->gTimer - 1800) * 3}, 3, BLANC, OPAQUE, (jeu->gTimer - 1800) / 5);
     }
     if (jeu->gTimer >= 1880 && jeu->gTimer < 2280)
     {
-        DisplayText("\"pesenka\"", new Vector2(400, W_HAUTEUR - (jeu->gTimer - 1880) * 3), 3, scroll: (jeu->gTimer - 1880) / 5);
-        DisplayText("Sergey Zhukov et Aleksey Potekhin", new Vector2(400, W_HAUTEUR - (jeu->gTimer - 1900) * 3), 3, scroll: (jeu->gTimer - 1900) / 5);
+        DisplayText(jeu, "\"pesenka\"", (Vector2){400, W_HAUTEUR - (jeu->gTimer - 1880) * 3}, 3, BLANC, OPAQUE, (jeu->gTimer - 1880) / 5);
+        DisplayText(jeu, "Sergey Zhukov et Aleksey Potekhin", (Vector2){400, W_HAUTEUR - (jeu->gTimer - 1900) * 3}, 3, BLANC, OPAQUE, (jeu->gTimer - 1900) / 5);
     }
     if (jeu->gTimer >= 1980 && jeu->gTimer < 2380)
     {
-        DisplayText("\"the beginning of time\"", new Vector2(400, W_HAUTEUR - (jeu->gTimer - 1980) * 3), 3, scroll: (jeu->gTimer - 1980) / 5);
-        DisplayText("nathan ingalls (dj-nate)", new Vector2(400, W_HAUTEUR - (jeu->gTimer - 2000) * 3), 3, scroll: (jeu->gTimer - 2000) / 5);
+        DisplayText(jeu, "\"the beginning of time\"", (Vector2){400, W_HAUTEUR - (jeu->gTimer - 1980) * 3}, 3, BLANC, OPAQUE, (jeu->gTimer - 1980) / 5);
+        DisplayText(jeu, "nathan ingalls (dj-nate)", (Vector2){400, W_HAUTEUR - (jeu->gTimer - 2000) * 3}, 3, BLANC, OPAQUE, (jeu->gTimer - 2000) / 5);
     }
     if (jeu->gTimer >= 2250)
     {
@@ -311,9 +329,13 @@ void Scene4(Jeu* jeu, i32 gTimer) {
             alpha = (u8)((jeu->gTimer - 2250) * 2.5f);
         else
             alpha = 255;
-        DisplayText("fin", new Vector2(CENTRE, CENTRE), 5, alpha: alpha);
+
+        if (jeu->gTimer > 2550)
+            alpha = 255 - (u8)((jeu->gTimer - 2550) * 5);
+
+        DisplayText(jeu, "fin", (Vector2){CENTRE, CENTRE}, 5, BLANC, alpha, NO_SCROLL);
         if (jeu->gTimer > 2350)
-            DisplayText("tapez \"arcade\" au menu du jeu pour accéder au mode arcade!", new Vector2(5, 5), 1, alpha: (short)((jeu->gTimer - 2350) * 10));
+            DisplayText(jeu, "tapez \"arcade\" au menu du jeu pour accéder au mode arcade!", (Vector2){5, 5}, 1, BLANC, ((jeu->gTimer - 2350) * 10), NO_SCROLL);
     }
 
     if (jeu->gTimer >= 400 && jeu->gTimer < 500)
@@ -332,19 +354,19 @@ void Scene4(Jeu* jeu, i32 gTimer) {
     {
         if (jeu->gTimer == 600)
         {
-            new Ennemi(TypeEnnemi.CROISSANT, StatusEnnemi.INITIALIZATION);
-            new Ennemi(TypeEnnemi.OCTAHEDRON, StatusEnnemi.INITIALIZATION);
-            new Ennemi(TypeEnnemi.DIAMANT, StatusEnnemi.INITIALIZATION);
+            ens_s4[0] = CreerEnnemi(jeu, TYPEENNEMI_CROISSANT, STATUSENNEMI_INITIALIZATION, NULL);
+            ens_s4[1] = CreerEnnemi(jeu, TYPEENNEMI_OCTAHEDRON, STATUSENNEMI_INITIALIZATION, NULL);
+            ens_s4[2] = CreerEnnemi(jeu, TYPEENNEMI_DIAMANT, STATUSENNEMI_INITIALIZATION, NULL);
             for (u8 i = 0; i < 3; i++)
             {
-                jeu->enemies[i].position.z = -5;
-                jeu->enemies[i].pitch = 0.2f;
+                ens_s4[i]->self.position.z = -5;
+                ens_s4[i]->self.pitch = 0.2f;
             }
         }
         for (u8 i = 0; i < 3; i++)
         {
-            jeu->enemies[i].position.x = (600 - jeu->gTimer) * 8.2f + 2000 + i * 200;
-            jeu->enemies[i].position.y = (float)Sin((jeu->gTimer - 600) / -10.0f + i) * 50 + W_SEMI_HAUTEUR;
+            ens_s4[i]->self.position.x = (600 - jeu->gTimer) * 8.2f + 2000 + i * 200;
+            ens_s4[i]->self.position.y = SDL_sinf((jeu->gTimer - 600) / -10.0f + i) * 50 + W_SEMI_HAUTEUR;
         }
         if (jeu->gTimer == 899)
         {
@@ -362,28 +384,28 @@ void Scene4(Jeu* jeu, i32 gTimer) {
             }
             if (jeu->gTimer == 1000)
             {
-                ens[i] = new Ennemi(TypeEnnemi.PATRA, StatusEnnemi.PATRA_8_RESTANT);
-                ens[i].position.z = -5;
+                ens_s4[i] = CreerEnnemi(jeu, TYPEENNEMI_PATRA, STATUSENNEMI_PATRA_8_RESTANT, NULL);
+                ens_s4[i]->self.position.z = -5;
             }
             if (jeu->gTimer > 1150)
             {
                 if (i == 0)
-                    ens[i].position.x = 300 - SDL_powf((jeu->gTimer - 1150), 1.9f);
+                    ens_s4[i]->self.position.x = 300 - SDL_powf((jeu->gTimer - 1150), 1.9f);
                 else
-                    ens[i].position.x = 1000 + SDL_powf((jeu->gTimer - 1150), 1.9f);
-                ens[i].position.y = 800 - SDL_powf(jeu->gTimer - 1150, 2);
+                    ens_s4[i]->self.position.x = 1000 + SDL_powf((jeu->gTimer - 1150), 1.9f);
+                ens_s4[i]->self.position.y = 800 - SDL_powf(jeu->gTimer - 1150, 2);
             }
             else
             {
-                ens[i].position.x = 300 + i * 700;
-                ens[i].position.y = (jeu->gTimer - 1000) * -3 + 1250;
+                ens_s4[i]->self.position.x = 300 + i * 700;
+                ens_s4[i]->self.position.y = (jeu->gTimer - 1000) * -3 + 1250;
             }
         }
 
         if (jeu->gTimer == 1199)
         {
-            jeu->enemies.Remove(ens[0]);
-            jeu->enemies.Remove(ens[1]);
+            ens_s4[0]->self.afficher = SDL_FALSE;
+            ens_s4[1]->self.afficher = SDL_FALSE;
         }
     }
     else if (jeu->gTimer >= 1300 && jeu->gTimer < 1600)
@@ -392,33 +414,33 @@ void Scene4(Jeu* jeu, i32 gTimer) {
         {
             if (jeu->gTimer == 1599)
             {
-                jeu->enemies.Remove(ens[i]);
+                ens_s4[i]->self.afficher = SDL_FALSE;
                 break;
             }
             if (jeu->gTimer == 1300)
             {
-                ens[i] = new Ennemi(TypeEnnemi.ENERGIE, StatusEnnemi.INITIALIZATION);
-                ens[i].position.z = -5;
+                ens_s4[i] = CreerEnnemi(jeu, TYPEENNEMI_ENERGIE, STATUSENNEMI_INITIALIZATION, NULL);
+                ens_s4[i]->self.position.z = -5;
             }
-            ens[i].position.x = 200 + i * 1500 + (jeu->gTimer - 1300);
-            ens[i].position.y = (jeu->gTimer - 1300) * -4 + 1150 + i * 200;
+            ens_s4[i]->self.position.x = 200 + i * 1500 + (jeu->gTimer - 1300);
+            ens_s4[i]->self.position.y = (jeu->gTimer - 1300) * -4 + 1150 + i * 200;
         }
     }
     else if (jeu->gTimer >= 1620 && jeu->gTimer < 1830)
     {
         if (jeu->gTimer == 1620)
         {
-            ens[1] = new Ennemi(TypeEnnemi.TOURNANT, StatusEnnemi.INITIALIZATION);
-            ens[1].position.z = 10;
+            ens_s4[1] = CreerEnnemi(jeu, TYPEENNEMI_TOURNANT, STATUSENNEMI_INITIALIZATION, NULL);
+            ens_s4[1]->self.position.z = 10;
         }
 
-        ens[1].position.x = 1000;
-        ens[1].position.y = (jeu->gTimer - 1620) * -3 + 1150;
+        ens_s4[1]->self.position.x = 1000;
+        ens_s4[1]->self.position.y = (jeu->gTimer - 1620) * -3 + 1150;
 
         if (jeu->gTimer == 1829)
         {
-            jeu->explosions.Clear();
-            new Explosion(new Vector3(ens[1].position.x, ens[1].position.y, 40));
+            ClearExplosions(jeu);
+            CreerExplosion(jeu, (Vector3) { ens_s4[1]->self.position.x, ens_s4[1]->self.position.y, 40 });
             ClearEnnemis(jeu);
         }
     }
@@ -426,25 +448,25 @@ void Scene4(Jeu* jeu, i32 gTimer) {
     {
         if (jeu->gTimer == 1900)
         {
-            ens[0] = new Ennemi(TypeEnnemi.DUPLIQUEUR, StatusEnnemi.INITIALIZATION);
-            ens[0].position.z = -5;
-            ens[0].pitch = -0.6f;
+            ens_s4[0] = CreerEnnemi(jeu, TYPEENNEMI_DUPLIQUEUR, STATUSENNEMI_INITIALIZATION, NULL);
+            ens_s4[0]->self.position.z = -5;
+            ens_s4[0]->self.pitch = -0.6f;
         }
-        ens[0].roll = 0.5f * (float)Sin(jeu->gTimer / 6.0f);
-        ens[0].position.y = (jeu->gTimer - 1900) * -3.0f + 1100;
-        ens[0].position.x = (jeu->gTimer - 1900) * -8 + 1950;
+        ens_s4[0]->self.roll = 0.5f * SDL_sinf(jeu->gTimer / 6.0f);
+        ens_s4[0]->self.position.y = (jeu->gTimer - 1900) * -3.0f + 1100;
+        ens_s4[0]->self.position.x = (jeu->gTimer - 1900) * -8 + 1950;
         if (jeu->gTimer == 1999)
         {
-            ens[1] = new Ennemi(TypeEnnemi.DUPLIQUEUR, StatusEnnemi.INITIALIZATION);
-            ens[1].pitch = -0.6f;
-            ens[0].position.z = 5;
-            ens[1].position.z = 5;
+            ens_s4[1] = CreerEnnemi(jeu, TYPEENNEMI_DUPLIQUEUR, STATUSENNEMI_INITIALIZATION, NULL);
+            ens_s4[1]->self.pitch = -0.6f;
+            ens_s4[0]->self.position.z = 5;
+            ens_s4[1]->self.position.z = 5;
         }
     }
     else if (jeu->gTimer > 2240)
     {
         jeu->joueur->self.taille = 1;
-        jeu->joueur->self.roll = (float)Sin(jeu->gTimer / 8.0f) / 5.0f;
+        jeu->joueur->self.roll = SDL_sinf(jeu->gTimer / 8.0f) / 5.0f;
         jeu->joueur->self.pitch = 0.3f;
         jeu->joueur->self.position.x = W_SEMI_LARGEUR;
         jeu->joueur->self.position.y = W_SEMI_HAUTEUR + 100;
@@ -454,31 +476,31 @@ void Scene4(Jeu* jeu, i32 gTimer) {
         else
             alpha = 255;
         jeu->joueur->self.couleure.a = alpha;
-        jeu->joueur->self.RenderObjet();
+        RenderSprite(&jeu->joueur->self);
     }
 
     if (jeu->gTimer >= 1600 && jeu->gTimer < 1750)
     {
         if (jeu->gTimer == 1749)
         {
-            jeu->enemies.Remove(ens[0]);
+            ens_s4[0]->self.afficher = SDL_FALSE;
         }
         else
         {
             if (jeu->gTimer == 1600)
-                ens[0] = new Ennemi(TypeEnnemi.BOSS, StatusEnnemi.INITIALIZATION);
+                ens_s4[0] = CreerEnnemi(jeu, TYPEENNEMI_BOSS, STATUSENNEMI_INITIALIZATION, NULL);
 
-            ens[0].position.z = 40 - Pow((jeu->gTimer - 1600) / 33.0f, 3);
-            ens[0].pitch = (jeu->gTimer - 1600) / -200.0f;
-            ens[0].roll = (1600 - jeu->gTimer) * (float)(M_PI / 600);
+            ens_s4[0]->self.position.z = 40 - SDL_powf((jeu->gTimer - 1600) / 33.0f, 3);
+            ens_s4[0]->self.pitch = (jeu->gTimer - 1600) / -200.0f;
+            ens_s4[0]->self.roll = (1600 - jeu->gTimer) * (float)(M_PI / 600);
 
             if (jeu->gTimer < 1650)
-                ens[0].position.x = 1500 + (jeu->gTimer - 1600) * 10;
+                ens_s4[0]->self.position.x = 1500 + (jeu->gTimer - 1600) * 10;
             else
-                ens[0].position.x = -600 + (jeu->gTimer - 1600) * 10;
+                ens_s4[0]->self.position.x = -600 + (jeu->gTimer - 1600) * 10;
 
-            ens[0].position.y = 200 * (float)Sin((jeu->gTimer - 1600) / 50.0f) + W_SEMI_HAUTEUR;
-            ens[0].couleure.a = jeu->gTimer < 1620 ? (u8)((jeu->gTimer - 1600) * 12.0f) : (u8)255;
+            ens_s4[0]->self.position.y = 200 * SDL_sinf((jeu->gTimer - 1600) / 50.0f) + W_SEMI_HAUTEUR;
+            ens_s4[0]->self.couleure.a = jeu->gTimer < 1620 ? (u8)((jeu->gTimer - 1600) * 12.0f) : (u8)255;
         }
     }
     else if (jeu->gTimer >= 1770 && jeu->gTimer < 1850)
@@ -497,16 +519,16 @@ void Scene4(Jeu* jeu, i32 gTimer) {
         {
             for (int i = 0; i < 2; i++)
             {
-                float line[4];
-                RenderDataLigne(jeu->joueur->indexs_de_tir[i % 2]);
-                new Projectile(
-                    new Vector3(line[0], line[1], jeu->joueur->position.z),
-                    new Vector3(
-                        jeu->joueur->position.x + 10 + i % 2 * 2 * -10,
-                        jeu->joueur->position.y - 350,
+                float ligne[4];
+                PositionLigneModele(&jeu->joueur->self, jeu->joueur->self.indexs_de_tir[i % 2], ligne);
+                CreerProjectile(jeu,
+                    (Vector3){ligne[0], ligne[1], jeu->joueur->self.position.z},
+                    (Vector3){
+                        jeu->joueur->self.position.x + 10 + i % 2 * 2 * -10,
+                        jeu->joueur->self.position.y - 350,
                         20
-                    ),
-                    ProprietaireProjectile.JOUEUR,
+                    },
+                    PROPRIETAIREPROJ_JOUEUR,
                     (u8)(i % 2)
                 );
             }
@@ -523,52 +545,63 @@ void Scene4(Jeu* jeu, i32 gTimer) {
         {
             for (u8 i = 0; i < 2; i++)
             {
-                jeu->enemies[i].roll = 0.5f * (float)Sin(jeu->gTimer / 6f);
-                jeu->enemies[i].position.x = (jeu->gTimer - 1900) * -8 + 1950;
+                ens_s4[i]->self.roll = 0.5f * SDL_sinf(jeu->gTimer / 6.0f);
+                ens_s4[i]->self.position.x = (jeu->gTimer - 1900) * -8 + 1950;
             }
-            jeu->enemies[0].position.y = (jeu->gTimer - 1900) * -3f + 1100 + (float)Sqrt(jeu->gTimer - 1999) * 18;
-            jeu->enemies[1].position.y = (jeu->gTimer - 1900) * -3f + 1100 - (float)Sqrt(jeu->gTimer - 1999) * 18;
+            ens_s4[0]->self.position.y = (jeu->gTimer - 1900) * -3.0f + 1100 + SDL_sqrtf(jeu->gTimer - 1999) * 18;
+            ens_s4[1]->self.position.y = (jeu->gTimer - 1900) * -3.0f + 1100 - SDL_sqrtf(jeu->gTimer - 1999) * 18;
         }
     }
 
-    foreach(Ennemi e in jeu->enemies)
+    for (int i = 0; i < 3; i++)
     {
-        e.RenderObjet();
-        e.ActualiserModele();
-        e.timer++;
+        if (ens_s4[i] == NULL || !ens_s4[i]->self.afficher) {
+            continue;
+        }
+
+        RenderEnnemi(&ens_s4[i]->self);
+        ActualiserModeleEnnemi(ens_s4[i]);
+        ens_s4[i]->self.timer++;
     }
-    for (int i = 0; i < jeu->explosions.Count; i++)
+    for (int i = 0; i < NB_EXPLOSIONS; i++)
     {
-        jeu->explosions[i].RenderObjet();
-        if (jeu->explosions[i].Exist())
-            i--;
+        if (jeu->explosions[i].jeu == NULL || !jeu->explosions[i].timer) {
+            continue;
+        }
+
+        RenderExplosion(&jeu->explosions[i]);
+        ExistExplosion(&jeu->explosions[i]);
     }
-    for (int i = 0; i < jeu->projectiles.Count; i++)
+    for (int i = 0; i < NB_PROJECTILES; i++)
     {
-        jeu->projectiles[i].RenderObjet();
-        if (jeu->projectiles[i].Exist())
-            i--;
+        if (jeu->projectiles[i].self.jeu == NULL || !jeu->projectiles[i].self.afficher) {
+            continue;
+        }
+
+        RenderProjectile(&jeu->projectiles[i]);
+        ExistProjectile(&jeu->projectiles[i]);
     }
 
 
-    if (jeu->gTimer > 2550)
-        gFade = (u8)((jeu->gTimer - 2550) * 5);
-    if (gFade != 0)
-    {
-        rect.x = 0; rect.y = 0; rect.w = W_LARGEUR; rect.h = W_HAUTEUR;
-        SDL_SetRenderDrawColor(jeu->render, 0, 0, 0, gFade);
-        SDL_RenderFillRect(jeu->render, ref rect);
-    }
+    //if (jeu->gTimer > 2550)
+    //    gFade = (u8)((jeu->gTimer - 2550) * 5);
+    //if (gFade != 0)
+    //{
+    //    rect.x = 0; rect.y = 0; rect.w = W_LARGEUR; rect.h = W_HAUTEUR;
+    //    SDL_SetRenderDrawColor(jeu->render, 0, 0, 0, gFade);
+    //    SDL_RenderFillRect(jeu->render, ref rect);
+    //}
 
 
     if (jeu->gTimer > 2600)
     {
         jeu->gamemode = GAMEMODE_MENU_PRINCIPAL;
+        jeu->gTimer = 0;
         JouerMusique(jeu, MUSIQUE_DYSGENESIS, SDL_TRUE);
         InitializerJoueur(jeu->joueur);
         jeu->joueur->self.afficher = SDL_TRUE;
         jeu->bouger_etoiles = SDL_TRUE;
-        gFade = 0;
+        //gFade = 0;
         jeu->bombe->HP = BOMBE_PULSAR_MAX_HP;
     }
 }
